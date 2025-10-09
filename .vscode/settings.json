@@ -1,0 +1,12 @@
+{
+    // ... 其他設定
+    "github.copilot.chat.commitMessageGeneration.instructions": [
+        {
+            "text": "請始終使用**繁體中文**生成 Git 提交訊息的**所有內容**。"
+        },
+        {
+            "text": "訊息應簡潔明瞭，並遵循**慣例提交 (Conventional Commits)** 格式：<類型>：<描述>，並在內文提供詳細說明。"
+        }
+    ]
+    // ... 其他設定
+}
