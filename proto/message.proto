@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package communication;
+
+// Go package option, pointing to the generated code directory for the server.
+option go_package = "./;generated";
+
+// C# namespace option, pointing to the generated code directory for the client.
+option csharp_namespace = "ProtoBufferExample.Client.Generated";
+
+// Message for user login credentials.
+message UserCredentials {
+  string username = 1;
+  string password = 2;
+}
+
+// Message for player position updates.
+message PlayerPosition {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+// A wrapper message to contain any of the other messages.
+// This allows for a single stream/endpoint to handle multiple message types.
+message WrapperMessage {
+  // Enum to identify the type of message contained in the 'payload'.
+  enum MessageType {
+    USER_CREDENTIALS = 0;
+    PLAYER_POSITION = 1;
+  }
+
+  MessageType type = 1;
+
+  oneof payload {
+    UserCredentials user_credentials = 2;
+    PlayerPosition player_position = 3;
+  }
+}
