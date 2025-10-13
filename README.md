@@ -4,9 +4,9 @@
 
 | 項目 | 技術棧 | 說明 |
 | :--- | :--- | :--- |
-| **Server** | **Go (Golang)** | 負責統一的業務邏輯層，可啟動 TCP Socket 或 HTTP 伺服器。 |
-| **Client** | **Unity (C#)** | 負責統一的業務邏輯層，可切換使用 Socket 或 HTTP 客戶端。 |
-| **核心抽象** | **資料模型層** & **傳輸協定層** | 確保業務邏輯不依賴於 Protobuf 或 JSON，也不依賴於 TCP 或 HTTP。 |
+| **Server** | **Go (使用 `antnet` 框架)** | 負責統一的業務邏輯層，利用 `antnet` 快速啟動 TCP Socket 或 WebSocket 伺服器。 |
+| **Client** | **Unity (C#)** | 負責統一的業務邏輯層，可切換使用 Socket 或 WebSocket 客戶端。 |
+| **核心抽象** | **資料模型層** & **傳輸協定層** | 確保業務邏輯不依賴於 Protobuf 或 JSON，也不依賴於 TCP 或 HTTP/WebSocket。 |
 
 ---
 
@@ -15,38 +15,24 @@
 | 模式 | 傳輸協定 | 資料格式 | 適用場景 |
 | :--- | :--- | :--- | :--- |
 | **實驗模式 I** | **TCP** (Socket 連線) | **Protocol Buffers** (二進位) | 遊戲內即時數據交換、高頻率同步。 |
-| **實驗模式 II** | **HTTP** (REST API) | **JSON** (文字) | 登入、配置獲取、後台管理、低頻率操作。 |
-
----
-
-## 🛠️ 先決條件
-
-在啟動專案前，請確保您的開發環境已安裝以下工具：
-
-1.  **Go Runtime & SDK**
-2.  **Unity Editor (建議版本：LTS)**
-3.  **Protocol Buffers 編譯器 (`protoc`)**
-    * Go 插件安裝：`go install google.golang.org/protobuf/cmd/protoc-gen-go@latest`
-4.  **NJsonSchema/OpenAPI 相關工具** (用於模式 II 的 C# 客戶端生成與驗證)
+| **實驗模式 II** | **WebSocket** | **JSON** (文字) | 登入、配置獲取、後台管理、低頻率操作。 |
 
 ---
 
 ## 💡 實作待辦事項 (TODO)
 
-為了實現雙重解耦的架構，以下是接下來需要完成的關鍵任務：
+在決定使用 `antnet` 框架後，我們的開發任務將聚焦於業務邏輯和客戶端的實現：
 
-1.  **定義統一資料模型 (Data Models):**
-    * 在共用層次定義業務所需的 Go Structs / C# Classes (例如 `UserCredentials`, `PlayerPosition`)，**不包含**任何 Protobuf 或 JSON 標籤。
-2.  **實作 Protobuf 格式層 (模式 I):**
-    * 撰寫 `proto/message.proto`，將步驟 1 的資料模型轉換為 Protobuf 格式。
-    * 執行 `protoc` 指令生成 Go 和 C# 程式碼。
-3.  **實作 JSON 格式層 (模式 II):**
-    * 在 Server 端定義 REST API 路由，使用標準 Go JSON 處理或 NJsonSchema 相關工具進行序列化。
-4.  **抽象傳輸層 (IConnection):**
-    * 定義 Go/C# 的 `IConnection` 介面，用於發送/接收序列化後的位元組/資料。
-5.  **具體傳輸實作:**
-    * 實作 `TCPTransport` (用於模式 I)。
-    * 實作 `HTTPClientTransport` / `HTTPServer` (用於模式 II)。
+1.  **Server: 初始化 `antnet` 專案**:
+    *   設定 Go Server 專案並引入 `antnet` 函式庫。
+2.  **Server: 定義訊息處理器 (Handlers)**:
+    *   在 `antnet` 中實作 `Handler` 來處理 `UserCredentials` 和 `PlayerPosition` 等業務邏輯。
+3.  **Client: 建立通訊模組**:
+    *   在 Unity 中實作 `TCPClientTransport` 和 `WebSocketClientTransport` 以連接到 `antnet` 伺服器。
+4.  **整合測試 (模式 I - Protobuf/TCP)**:
+    *   讓 Client 透過 TCP 發送 Protobuf 訊息給 Server，並驗證業務邏輯。
+5.  **整合測試 (模式 II - JSON/WebSocket)**:
+    *   讓 Client 透過 WebSocket 發送 JSON 訊息給 Server，並驗證業務邏輯。
 
 ---
 
