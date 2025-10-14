@@ -1,6 +1,7 @@
 # AGENTS.md：專案協作指南與實作清單
 
 ## 使用者偏好
+
 - 專案相關的任何文件產出、討論、註解都請使用中文。
 
 ## 專案狀態與核心目標
@@ -58,3 +59,5 @@
 | 11 | **設定 `antnet` WebSocket 端點** | 設定 `antnet` 伺服器監聽一個 WebSocket 埠，並使用 JSON 解析器。 | `server/main.go` 更新 |
 | 12 | **實作 `WebSocketClientTransport` (Client)** | 在 Unity Client 中實作 `IConnection` 介面，連接到 `antnet` 的 WebSocket 端點。 | `Client/Scripts/WebSocketClientTransport.cs` |
 | 13 | **端對端測試 (WebSocket)** | 實現 Client 發送位置更新，Server 處理並廣播的完整流程。 | 功能可運作 |
+| 14 | **Unity Client Viewer 介面** | -- | --|
+| 15 | **最終整合測試**|--| --|
