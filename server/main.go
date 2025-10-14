@@ -1,26 +1,28 @@
 package main
 
 import (
-    "fmt"
-    "github.com/magiclvzs/antnet"
-    "github.com/magiclvzs/antnet/parser"
-    "proto_buffer_example/server/handlers" // Import the new package
+	"fmt" // Import the new package
+	"proto_buffer_example/server/third-party/antnet"
 )
 
 func main() {
-    s, err := antnet.NewServer("tcp://:6666",
-        antnet.WithParser(parser.NewPBParser(4096, true)),
-    )
-    if err != nil {
-        fmt.Printf("Failed to create server: %v\n", err)
-        return
-    }
 
-    // Register handlers from the handlers package
-    s.Register(1, &handlers.LoginHandler{})
-    s.Register(3, &handlers.PositionHandler{}) // Register the new handler
+	addr := "tcp://:6666"
+	msgHandler := &antnet.EchoMsgHandler{}
+	// msgHandler := &customize.MsgHandler{}
+	// msgParser := &antnet.Parser{Type: antnet.ParserTypePB}
 
-    fmt.Println("Starting antnet server on tcp://:6666")
-    s.Run()
+	err := antnet.StartServer(addr, antnet.MsgTypeMsg, msgHandler, nil)
+	if err != nil {
+		fmt.Printf("Failed to start server: %v\n", err)
+		panic(err)
+	}
+	antnet.WaitForSystemExit()
+
+	// // Register handlers from the handlers package
+	// msgHandler.Register(1, &handlers.LoginHandler{})
+	// msgHandler.Register(3, &handlers.PositionHandler{}) // Register the new handler
+
+	// fmt.Println("Starting antnet server on tcp://:6666")
+	// msgHandler.Run()
 }
-
