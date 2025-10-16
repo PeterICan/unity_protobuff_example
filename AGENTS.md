@@ -54,8 +54,8 @@
 
 | # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- |
-| 10 | **設定 antnet WebSocket 端點** | 更新 `server/main.go`，新增 WebSocket 監聽埠並使用 JSON 解析器 | `server/main.go` 更新 | ▶️ 進行中 |
-| 11 | **實作 JSONSerializer** | 在 `Client/Scripts/` 中實作 `JSONSerializer.cs`，處理 JSON 格式序列化 | `Client/Scripts/JSONSerializer.cs` | ⏹️ 未開始 |
+| 10 | **設定 antnet WebSocket 端點** | 更新 `server/main.go`，新增 WebSocket 監聽埠並使用 JSON 解析器 | `server/main.go` 更新 | ✅ 已完成 |
+| 11 | **實作 JSONSerializer** | 在 `Client/Scripts/` 中實作 `JSONSerializer.cs`，處理 JSON 格式序列化 (JSON Schema 檔案位於 `common/json_schema/position.schema.json`；Client 端將使用 `NJsonSchema` 從 JSON Schema 生成 C# 類別；Go 後端將使用 `omissis/go-jsonschema` 從 JSON Schema 生成結構體) | `Client/Scripts/JSONSerializer.cs` | ▶️ 進行中 |
 | 12 | **實作 WebSocketClientTransport** | 在 `Client/Scripts/` 中實作 `WebSocketClientTransport.cs`，連接到 antnet 的 WebSocket 端點 | `Client/Scripts/WebSocketClientTransport.cs` | ⏹️ 未開始 |
 | 13 | **進行 WebSocket/JSON 位置測試** | 測試 Client 發送位置更新，Server 處理並廣播的完整 WebSocket 流程 | 功能可運作 | ⏹️ 未開始 |
 
