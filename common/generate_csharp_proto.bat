@@ -1,7 +1,7 @@
 @echo off
 rem This script generates C# code from the .proto file.
 
-set PROTO_DIR=..\proto
+set PROTO_DIR=.\proto
 set CSHARP_OUT_DIR=..\client\Assets\Generated
 
 echo Ensuring C# output directory exists: %CSHARP_OUT_DIR%

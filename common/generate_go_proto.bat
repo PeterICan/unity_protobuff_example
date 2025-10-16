@@ -1,7 +1,7 @@
 @echo off
 rem This script generates Go code from the .proto file.
 
-set PROTO_DIR=..\proto
+set PROTO_DIR=.\proto
 set GO_OUT_DIR=..\server\generated
 
 echo Ensuring Go output directory exists: %GO_OUT_DIR%
