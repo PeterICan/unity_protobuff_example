@@ -21,6 +21,103 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Enum for command types
+type Cmd int32
+
+const (
+	Cmd_CMD_RESERVED Cmd = 0 // Reserved
+	Cmd_CMD_LOGIN    Cmd = 1 // Login related
+	Cmd_CMD_POSITION Cmd = 3 // Position related
+)
+
+// Enum value maps for Cmd.
+var (
+	Cmd_name = map[int32]string{
+		0: "CMD_RESERVED",
+		1: "CMD_LOGIN",
+		3: "CMD_POSITION",
+	}
+	Cmd_value = map[string]int32{
+		"CMD_RESERVED": 0,
+		"CMD_LOGIN":    1,
+		"CMD_POSITION": 3,
+	}
+)
+
+func (x Cmd) Enum() *Cmd {
+	p := new(Cmd)
+	*p = x
+	return p
+}
+
+func (x Cmd) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Cmd) Descriptor() protoreflect.EnumDescriptor {
+	return file_message_proto_enumTypes[0].Descriptor()
+}
+
+func (Cmd) Type() protoreflect.EnumType {
+	return &file_message_proto_enumTypes[0]
+}
+
+func (x Cmd) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Cmd.Descriptor instead.
+func (Cmd) EnumDescriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{0}
+}
+
+// Enum for actions related to position
+type ActPosition int32
+
+const (
+	ActPosition_ACT_POSITION_RESERVED ActPosition = 0
+	ActPosition_ACT_POSITION_UPDATE   ActPosition = 1 // Position update
+)
+
+// Enum value maps for ActPosition.
+var (
+	ActPosition_name = map[int32]string{
+		0: "ACT_POSITION_RESERVED",
+		1: "ACT_POSITION_UPDATE",
+	}
+	ActPosition_value = map[string]int32{
+		"ACT_POSITION_RESERVED": 0,
+		"ACT_POSITION_UPDATE":   1,
+	}
+)
+
+func (x ActPosition) Enum() *ActPosition {
+	p := new(ActPosition)
+	*p = x
+	return p
+}
+
+func (x ActPosition) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ActPosition) Descriptor() protoreflect.EnumDescriptor {
+	return file_message_proto_enumTypes[1].Descriptor()
+}
+
+func (ActPosition) Type() protoreflect.EnumType {
+	return &file_message_proto_enumTypes[1]
+}
+
+func (x ActPosition) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ActPosition.Descriptor instead.
+func (ActPosition) EnumDescriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{1}
+}
+
 // Enum to identify the type of message contained in the 'payload'.
 type WrapperMessage_MessageType int32
 
@@ -52,11 +149,11 @@ func (x WrapperMessage_MessageType) String() string {
 }
 
 func (WrapperMessage_MessageType) Descriptor() protoreflect.EnumDescriptor {
-	return file_message_proto_enumTypes[0].Descriptor()
+	return file_message_proto_enumTypes[2].Descriptor()
 }
 
 func (WrapperMessage_MessageType) Type() protoreflect.EnumType {
-	return &file_message_proto_enumTypes[0]
+	return &file_message_proto_enumTypes[2]
 }
 
 func (x WrapperMessage_MessageType) Number() protoreflect.EnumNumber {
@@ -293,7 +390,14 @@ const file_message_proto_rawDesc = "" +
 	"\vMessageType\x12\x14\n" +
 	"\x10USER_CREDENTIALS\x10\x00\x12\x13\n" +
 	"\x0fPLAYER_POSITION\x10\x01B\t\n" +
-	"\apayloadB4Z\f./;generated\xaa\x02#ProtoBufferExample.Client.Generatedb\x06proto3"
+	"\apayload*8\n" +
+	"\x03Cmd\x12\x10\n" +
+	"\fCMD_RESERVED\x10\x00\x12\r\n" +
+	"\tCMD_LOGIN\x10\x01\x12\x10\n" +
+	"\fCMD_POSITION\x10\x03*A\n" +
+	"\vActPosition\x12\x19\n" +
+	"\x15ACT_POSITION_RESERVED\x10\x00\x12\x17\n" +
+	"\x13ACT_POSITION_UPDATE\x10\x01B4Z\f./;generated\xaa\x02#ProtoBufferExample.Client.Generatedb\x06proto3"
 
 var (
 	file_message_proto_rawDescOnce sync.Once
@@ -307,18 +411,20 @@ func file_message_proto_rawDescGZIP() []byte {
 	return file_message_proto_rawDescData
 }
 
-var file_message_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_message_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_message_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_message_proto_goTypes = []any{
-	(WrapperMessage_MessageType)(0), // 0: communication.WrapperMessage.MessageType
-	(*UserCredentials)(nil),         // 1: communication.UserCredentials
-	(*PlayerPosition)(nil),          // 2: communication.PlayerPosition
-	(*WrapperMessage)(nil),          // 3: communication.WrapperMessage
+	(Cmd)(0),                        // 0: communication.Cmd
+	(ActPosition)(0),                // 1: communication.ActPosition
+	(WrapperMessage_MessageType)(0), // 2: communication.WrapperMessage.MessageType
+	(*UserCredentials)(nil),         // 3: communication.UserCredentials
+	(*PlayerPosition)(nil),          // 4: communication.PlayerPosition
+	(*WrapperMessage)(nil),          // 5: communication.WrapperMessage
 }
 var file_message_proto_depIdxs = []int32{
-	0, // 0: communication.WrapperMessage.type:type_name -> communication.WrapperMessage.MessageType
-	1, // 1: communication.WrapperMessage.user_credentials:type_name -> communication.UserCredentials
-	2, // 2: communication.WrapperMessage.player_position:type_name -> communication.PlayerPosition
+	2, // 0: communication.WrapperMessage.type:type_name -> communication.WrapperMessage.MessageType
+	3, // 1: communication.WrapperMessage.user_credentials:type_name -> communication.UserCredentials
+	4, // 2: communication.WrapperMessage.player_position:type_name -> communication.PlayerPosition
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -340,7 +446,7 @@ func file_message_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_message_proto_rawDesc), len(file_message_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      3,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,

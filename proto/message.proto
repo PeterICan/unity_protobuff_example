@@ -8,6 +8,19 @@ option go_package = "./;generated";
 // C# namespace option, pointing to the generated code directory for the client.
 option csharp_namespace = "ProtoBufferExample.Client.Generated";
 
+// Enum for command types
+enum Cmd {
+  CMD_RESERVED = 0; // Reserved
+  CMD_LOGIN = 1;    // Login related
+  CMD_POSITION = 3; // Position related
+}
+
+// Enum for actions related to position
+enum ActPosition {
+  ACT_POSITION_RESERVED = 0;
+  ACT_POSITION_UPDATE = 1; // Position update
+}
+
 // Message for user login credentials.
 message UserCredentials {
   string username = 1;

@@ -32,12 +32,15 @@ namespace ProtoBufferExample.Client.Generated {
             "ZW50aWFscxgCIAEoCzIeLmNvbW11bmljYXRpb24uVXNlckNyZWRlbnRpYWxz",
             "SAASOAoPcGxheWVyX3Bvc2l0aW9uGAMgASgLMh0uY29tbXVuaWNhdGlvbi5Q",
             "bGF5ZXJQb3NpdGlvbkgAIjgKC01lc3NhZ2VUeXBlEhQKEFVTRVJfQ1JFREVO",
-            "VElBTFMQABITCg9QTEFZRVJfUE9TSVRJT04QAUIJCgdwYXlsb2FkQk1aJXBy",
-            "b3RvX2J1ZmZlcl9leGFtcGxlL3NlcnZlci9nZW5lcmF0ZWSqAiNQcm90b0J1",
-            "ZmZlckV4YW1wbGUuQ2xpZW50LkdlbmVyYXRlZGIGcHJvdG8z"));
+            "VElBTFMQABITCg9QTEFZRVJfUE9TSVRJT04QAUIJCgdwYXlsb2FkKjgKA0Nt",
+            "ZBIQCgxDTURfUkVTRVJWRUQQABINCglDTURfTE9HSU4QARIQCgxDTURfUE9T",
+            "SVRJT04QAypBCgtBY3RQb3NpdGlvbhIZChVBQ1RfUE9TSVRJT05fUkVTRVJW",
+            "RUQQABIXChNBQ1RfUE9TSVRJT05fVVBEQVRFEAFCNFoMLi87Z2VuZXJhdGVk",
+            "qgIjUHJvdG9CdWZmZXJFeGFtcGxlLkNsaWVudC5HZW5lcmF0ZWRiBnByb3Rv",
+            "Mw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::ProtoBufferExample.Client.Generated.Cmd), typeof(global::ProtoBufferExample.Client.Generated.ActPosition), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::ProtoBufferExample.Client.Generated.UserCredentials), global::ProtoBufferExample.Client.Generated.UserCredentials.Parser, new[]{ "Username", "Password" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ProtoBufferExample.Client.Generated.PlayerPosition), global::ProtoBufferExample.Client.Generated.PlayerPosition.Parser, new[]{ "X", "Y", "Z" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ProtoBufferExample.Client.Generated.WrapperMessage), global::ProtoBufferExample.Client.Generated.WrapperMessage.Parser, new[]{ "Type", "UserCredentials", "PlayerPosition" }, new[]{ "Payload" }, new[]{ typeof(global::ProtoBufferExample.Client.Generated.WrapperMessage.Types.MessageType) }, null, null)
@@ -46,6 +49,38 @@ namespace ProtoBufferExample.Client.Generated {
     #endregion
 
   }
+  #region Enums
+  /// <summary>
+  /// Enum for command types
+  /// </summary>
+  public enum Cmd {
+    /// <summary>
+    /// Reserved
+    /// </summary>
+    [pbr::OriginalName("CMD_RESERVED")] Reserved = 0,
+    /// <summary>
+    /// Login related
+    /// </summary>
+    [pbr::OriginalName("CMD_LOGIN")] Login = 1,
+    /// <summary>
+    /// Position related
+    /// </summary>
+    [pbr::OriginalName("CMD_POSITION")] Position = 3,
+  }
+
+  /// <summary>
+  /// Enum for actions related to position
+  /// </summary>
+  public enum ActPosition {
+    [pbr::OriginalName("ACT_POSITION_RESERVED")] Reserved = 0,
+    /// <summary>
+    /// Position update
+    /// </summary>
+    [pbr::OriginalName("ACT_POSITION_UPDATE")] Update = 1,
+  }
+
+  #endregion
+
   #region Messages
   /// <summary>
   /// Message for user login credentials.
