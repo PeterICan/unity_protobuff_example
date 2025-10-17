@@ -7,15 +7,22 @@ namespace ProtoBufferExample.Client
 {
     public class PositionUpdateTest : MonoBehaviour
     {
+        public enum ConnectType
+        {
+            TCP,
+            WebSocket
+        }
         public string serverAddress = "127.0.0.1";
         public int serverPort = 6666;
+
+        public ConnectType connectionType = ConnectType.TCP;
 
         private IConnection _connection;
         private ISerializer _serializer;
 
         void Start()
         {
-            _connection = new TCPClientTransport();
+            _connection = connectionType == ConnectType.TCP ? new TCPClientTransport() : new WebSocketClientTransport();
             _serializer = new ProtobufSerializer();
 
             _connection.OnMessageReceived += OnMessageReceived;
@@ -64,9 +71,23 @@ namespace ProtoBufferExample.Client
             byte[] headerBytes = CreateAntnetHeader((byte)Cmd.Position, (byte)ActPosition.Update, (uint)payloadBytes.Length);
 
             // 4. Combine header and payload
-            byte[] message = new byte[headerBytes.Length + payloadBytes.Length];
-            System.Buffer.BlockCopy(headerBytes, 0, message, 0, headerBytes.Length);
-            System.Buffer.BlockCopy(payloadBytes, 0, message, headerBytes.Length, payloadBytes.Length);
+            byte[] message = null;
+            if (connectionType == ConnectType.TCP)
+            {
+                message = new byte[headerBytes.Length + payloadBytes.Length];
+                System.Buffer.BlockCopy(headerBytes, 0, message, 0, headerBytes.Length);
+                System.Buffer.BlockCopy(payloadBytes, 0, message, headerBytes.Length, payloadBytes.Length);
+            }
+            else if (connectionType == ConnectType.WebSocket)
+            {
+
+                message = new byte[headerBytes.Length + payloadBytes.Length];
+                System.Buffer.BlockCopy(headerBytes, 0, message, 0, headerBytes.Length);
+                System.Buffer.BlockCopy(payloadBytes, 0, message, headerBytes.Length, payloadBytes.Length);
+                // //WebSocket 直接略過 header
+                // message = new byte[payloadBytes.Length];
+                // System.Buffer.BlockCopy(payloadBytes, 0, message, 0, payloadBytes.Length);
+            }
 
             // 5. Send the message
             _connection.Send(message);
