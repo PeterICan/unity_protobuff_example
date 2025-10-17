@@ -4,7 +4,7 @@ namespace ProtoBufferExample.Client
 {
     public class ProtobufSerializer : ISerializer
     {
-        public byte[] Serialize<T>(T obj)
+        public byte[] Serialize<T>(T obj) where T : IMessage<T>
         {
             if (obj is IMessage message)
             {
@@ -13,7 +13,7 @@ namespace ProtoBufferExample.Client
             throw new System.ArgumentException("Object must be of type Google.Protobuf.IMessage", nameof(obj));
         }
 
-        public T Deserialize<T>(byte[] data)
+        public T Deserialize<T>(byte[] data) where T : IMessage<T>, new()
         {
             // This requires a way to create an instance of T and then parse.
             // We assume T has a parameterless constructor and a Parser property.
