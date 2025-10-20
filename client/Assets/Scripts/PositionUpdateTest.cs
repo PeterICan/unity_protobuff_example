@@ -81,12 +81,12 @@ namespace ProtoBufferExample.Client
             else if (connectionType == ConnectType.WebSocket)
             {
 
-                message = new byte[headerBytes.Length + payloadBytes.Length];
-                System.Buffer.BlockCopy(headerBytes, 0, message, 0, headerBytes.Length);
-                System.Buffer.BlockCopy(payloadBytes, 0, message, headerBytes.Length, payloadBytes.Length);
+                // message = new byte[headerBytes.Length + payloadBytes.Length];
+                // System.Buffer.BlockCopy(headerBytes, 0, message, 0, headerBytes.Length);
+                // System.Buffer.BlockCopy(payloadBytes, 0, message, headerBytes.Length, payloadBytes.Length);
                 // //WebSocket 直接略過 header
-                // message = new byte[payloadBytes.Length];
-                // System.Buffer.BlockCopy(payloadBytes, 0, message, 0, payloadBytes.Length);
+                message = new byte[payloadBytes.Length];
+                System.Buffer.BlockCopy(payloadBytes, 0, message, 0, payloadBytes.Length);
             }
 
             // 5. Send the message
@@ -110,6 +110,18 @@ namespace ProtoBufferExample.Client
             byte cmd = message[6];
             byte act = message[7];
 
+            if (connectionType == ConnectType.WebSocket)
+            {
+                // WebSocket 省略 header 部分，直接處理 payload
+                len = (uint)message.Length;
+                error = 0;
+                cmd = (byte)Cmd.Position;
+                act = (byte)ActPosition.Update;
+                var position = _serializer.Deserialize<PlayerPosition>(message);
+                Debug.Log($"WebSocket received message, Received echo: (X: {position.X}, Y: {position.Y}, Z: {position.Z})");
+
+                return;
+            }
             if (cmd == (byte)Cmd.Position && act == (byte)ActPosition.Update)
             {
                 // Extract the payload
@@ -121,11 +133,10 @@ namespace ProtoBufferExample.Client
                 var position = _serializer.Deserialize<PlayerPosition>(payloadBytes);
 
                 Debug.Log($"Received echo: (X: {position.X}, Y: {position.Y}, Z: {position.Z})");
+                return;
             }
-            else
-            {
-                Debug.LogWarning($"Received unknown message. Cmd: {cmd}, Act: {act}");
-            }
+            
+            Debug.LogWarning($"Received unknown message. Cmd: {cmd}, Act: {act}");
         }
 
         private byte[] CreateAntnetHeader(byte cmd, byte act, uint payloadLength)

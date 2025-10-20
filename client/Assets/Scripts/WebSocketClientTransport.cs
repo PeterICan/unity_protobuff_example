@@ -92,7 +92,6 @@ namespace ProtoBufferExample.Client
             try
             {
                 await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token);
-                UnityEngine.Debug.Log("Send message hex: " + BitConverter.ToString(data));
             }
             catch (Exception e)
             {
