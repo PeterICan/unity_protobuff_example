@@ -12,6 +12,13 @@ namespace ProtoBufferExample.Client
             TCP,
             WebSocket
         }
+
+        public enum SerializeType
+        {
+            Protobuf,
+            MessagePack
+        }
+
         public string serverAddress = "127.0.0.1";
         public int serverPort = 6666;
 
@@ -23,7 +30,8 @@ namespace ProtoBufferExample.Client
         void Start()
         {
             _connection = connectionType == ConnectType.TCP ? new TCPClientTransport() : new WebSocketClientTransport();
-            _serializer = new ProtobufSerializer();
+
+            _serializer = connectionType == ConnectType.TCP ? (ISerializer)new ProtobufSerializer() : new JSONSerializer();
 
             _connection.OnMessageReceived += OnMessageReceived;
 
