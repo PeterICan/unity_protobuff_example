@@ -33,7 +33,7 @@ func NewTcpServer(addr string) Server {
 	msgHandler.Register(
 		byte(*generated.Cmd_CMD_POSITION.Enum()),
 		byte(generated.ActPosition_ACT_POSITION_UPDATE),
-		positionHandler.HandlePositionUpdate,
+		positionHandler.HandlePositionMsgUpdate,
 	)
 
 	return &tcpServer{

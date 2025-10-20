@@ -34,9 +34,9 @@ func NewWebSocketServer(addr string) Server {
 	// msgHandler.Register(
 	// 	uint8(*generated.Cmd_CMD_POSITION.Enum()),
 	// 	uint8(generated.ActPosition_ACT_POSITION_UPDATE),
-	// 	positionHandler.HandlePositionUpdate,
+	// 	positionHandler.HandlePositionMsgUpdate,
 	// )
-	msgHandler.RegisterMsg(&generated.PlayerPosition{}, positionHandler.HandlePositionUpdate)
+	msgHandler.RegisterMsg(&generated.PlayerPosition{}, positionHandler.HandlePositionCmdUpdate)
 
 	return &webSocketServer{
 		addr:       addr,
