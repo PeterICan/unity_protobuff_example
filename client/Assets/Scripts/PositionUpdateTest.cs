@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.IO;
-using System.Buffers;
 using ProtoBufferExample.Client.Generated;
+using Newtonsoft.Json.Linq;
+using JsonApi;
 
 namespace ProtoBufferExample.Client
 {
@@ -25,13 +26,21 @@ namespace ProtoBufferExample.Client
         public ConnectType connectionType = ConnectType.TCP;
 
         private IConnection _connection;
-        private ISerializer _serializer;
+        private ISerializer _protoSerializer; // For TCP/Protobuf
+        private JSONSerializer _jsonSerializer; // For WebSocket/JSON
 
         void Start()
         {
             _connection = connectionType == ConnectType.TCP ? new TCPClientTransport() : new WebSocketClientTransport();
 
-            _serializer = connectionType == ConnectType.TCP ? (ISerializer)new ProtobufSerializer() : new JSONSerializer();
+            if (connectionType == ConnectType.TCP)
+            {
+                _protoSerializer = new ProtobufSerializer();
+            }
+            else // WebSocket
+            {
+                _jsonSerializer = new JSONSerializer();
+            }
 
             _connection.OnMessageReceived += OnMessageReceived;
 
@@ -64,81 +73,117 @@ namespace ProtoBufferExample.Client
 
         private void SendPositionUpdate()
         {
-            // 1. Create the Protobuf message payload
-            var position = new PlayerPosition
-            {
-                X = Random.Range(-10f, 10f),
-                Y = Random.Range(-10f, 10f),
-                Z = Random.Range(-10f, 10f)
-            };
-
-            // 2. Serialize the payload
-            byte[] payloadBytes = _serializer.Serialize(position);
-
-            // 3. Create the antnet MessageHead using the generated enums
-            byte[] headerBytes = CreateAntnetHeader((byte)Cmd.Position, (byte)ActPosition.Update, (uint)payloadBytes.Length);
-
-            // 4. Combine header and payload
             byte[] message = null;
+
             if (connectionType == ConnectType.TCP)
             {
+                // 1. Create the Protobuf message payload
+                var position = new PlayerPosition
+                {
+                    X = Random.Range(-10f, 10f),
+                    Y = Random.Range(-10f, 10f),
+                    Z = Random.Range(-10f, 10f)
+                };
+
+                // 2. Serialize the payload
+                byte[] payloadBytes = _protoSerializer.Serialize(position);
+
+                // 3. Create the antnet MessageHead using the generated enums
+                byte[] headerBytes = CreateAntnetHeader((byte)Cmd.Position, (byte)ActPosition.Update, (uint)payloadBytes.Length);
+
+                // 4. Combine header and payload
                 message = new byte[headerBytes.Length + payloadBytes.Length];
                 System.Buffer.BlockCopy(headerBytes, 0, message, 0, headerBytes.Length);
                 System.Buffer.BlockCopy(payloadBytes, 0, message, headerBytes.Length, payloadBytes.Length);
+                Debug.Log($"Sent position update: (X: {position.X}, Y: {position.Y}, Z: {position.Z})");
             }
             else if (connectionType == ConnectType.WebSocket)
             {
+                // For WebSocket, create our new C2SPositionUpdate message
+                var positionUpdate = new C2SPositionUpdate
+                {
+                    Route = "position/update",
+                    // RequestId = System.Guid.NewGuid().ToString(), // request_id 暫時禁用
+                    X = Random.Range(-10f, 10f),
+                    Y = Random.Range(-10f, 10f),
+                    Z = Random.Range(-10f, 10f)
+                };
 
-                // message = new byte[headerBytes.Length + payloadBytes.Length];
-                // System.Buffer.BlockCopy(headerBytes, 0, message, 0, headerBytes.Length);
-                // System.Buffer.BlockCopy(payloadBytes, 0, message, headerBytes.Length, payloadBytes.Length);
-                // //WebSocket 直接略過 header
-                message = new byte[payloadBytes.Length];
-                System.Buffer.BlockCopy(payloadBytes, 0, message, 0, payloadBytes.Length);
+                // Serialize the C2SPositionUpdate message to JSON bytes
+                message = _jsonSerializer.Serialize(positionUpdate);
+                Debug.Log($"Sent position update: (X: {positionUpdate.X}, Y: {positionUpdate.Y}, Z: {positionUpdate.Z})");
             }
 
             // 5. Send the message
-            _connection.Send(message);
-
-            Debug.Log($"Sent position update: (X: {position.X}, Y: {position.Y}, Z: {position.Z})");
+            _connection.Send(message);            
         }
 
-        private void OnMessageReceived(byte[] message)
+        private void OnMessageReceived(byte[] messageBytes)
         {
-            // The server echoes the message back. Let's parse it.
-            if (message.Length < 12)
+            if (connectionType == ConnectType.WebSocket)
+            {
+                if (_jsonSerializer == null)
+                {
+                    Debug.LogError("JSONSerializer not initialized for WebSocket connection.");
+                    return;
+                }
+
+                // 1. Deserialize to generic JObject to get the route
+                JObject jsonObject = _jsonSerializer.DeserializeToJObject(messageBytes);
+                if (jsonObject == null)
+                {
+                    Debug.LogError("Failed to parse WebSocket message as JSON.");
+                    return;
+                }
+
+                string route = jsonObject["route"]?.ToString();
+                // string requestId = jsonObject["request_id"]?.ToString(); // request_id 暫時禁用
+
+                if (string.IsNullOrEmpty(route))
+                {
+                    Debug.LogWarning($"Received WebSocket message with no route: {jsonObject.ToString(Newtonsoft.Json.Formatting.None)}");
+                    return;
+                }
+
+                // 2. Based on route, deserialize to specific S2C message type
+                switch (route)
+                {
+                    case "position/update":
+                        var positionResponse = _jsonSerializer.Deserialize<S2CPositionUpdate>(messageBytes);
+                        Debug.Log($"WebSocket received position update response: Status: {positionResponse.Status}");
+                        // Further handle positionResponse if needed
+                        break;
+                    case "gamer_info/retrieve":
+                        var gamerInfoResponse = _jsonSerializer.Deserialize<S2CGamerInfoRetrieve>(messageBytes);
+                        Debug.Log($"WebSocket received gamer info response: Nickname: {gamerInfoResponse.NickName}, Level: {gamerInfoResponse.Level}");
+                        // Further handle gamerInfoResponse if needed
+                        break;
+                    default:
+                        Debug.LogWarning($"Received WebSocket message with unknown route: {route}. Full message: {jsonObject.ToString(Newtonsoft.Json.Formatting.None)}");
+                        break;
+                }
+                return;
+            }
+
+            // --- TCP Handling (remains largely the same) ---
+            if (messageBytes.Length < 12)
             {
                 Debug.LogError("Received message is too short to be a valid antnet message.");
                 return;
             }
 
-            // We can read the header to confirm it's the echo
-            uint len = System.BitConverter.ToUInt32(message, 0);
-            ushort error = System.BitConverter.ToUInt16(message, 4);
-            byte cmd = message[6];
-            byte act = message[7];
+            uint len = System.BitConverter.ToUInt32(messageBytes, 0);
+            ushort error = System.BitConverter.ToUInt16(messageBytes, 4);
+            byte cmd = messageBytes[6];
+            byte act = messageBytes[7];
 
-            if (connectionType == ConnectType.WebSocket)
-            {
-                // WebSocket 省略 header 部分，直接處理 payload
-                len = (uint)message.Length;
-                error = 0;
-                cmd = (byte)Cmd.Position;
-                act = (byte)ActPosition.Update;
-                var position = _serializer.Deserialize<PlayerPosition>(message);
-                Debug.Log($"WebSocket received message, Received echo: (X: {position.X}, Y: {position.Y}, Z: {position.Z})");
-
-                return;
-            }
             if (cmd == (byte)Cmd.Position && act == (byte)ActPosition.Update)
             {
-                // Extract the payload
-                int payloadSize = message.Length - 12;
+                int payloadSize = messageBytes.Length - 12;
                 byte[] payloadBytes = new byte[payloadSize];
-                System.Buffer.BlockCopy(message, 12, payloadBytes, 0, payloadSize);
+                System.Buffer.BlockCopy(messageBytes, 12, payloadBytes, 0, payloadSize);
 
-                // Deserialize the payload
-                var position = _serializer.Deserialize<PlayerPosition>(payloadBytes);
+                var position = _protoSerializer.Deserialize<PlayerPosition>(payloadBytes);
 
                 Debug.Log($"Received echo: (X: {position.X}, Y: {position.Y}, Z: {position.Z})");
                 return;
