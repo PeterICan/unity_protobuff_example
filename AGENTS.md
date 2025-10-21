@@ -63,7 +63,7 @@
 
 | # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- |
-| 14 | **為 WebSocket 定義獨立指令碼** | 為了讓 WebSocket 的路由與 Protobuf/TCP 分離，在 `common` 中為 JSON/WebSocket 模式定義一組獨立的 `Cmd` 和 `Act`。其封包欄位設計需要對 HTTP Web Request 友好，以支援直觀的 Web Request 請求。 | `common/types.go`, `common/Types.cs` 更新 | ⏹️ 未開始 |
+| 14 | **為 WebSocket 定義獨立指令碼** | 為了讓 WebSocket 的路由與 Protobuf/TCP 分離，在 `common` 中為 JSON/WebSocket 模式定義一組獨立的 `Cmd` 和 `Act`。其封包欄位設計需要對 HTTP Web Request 友好，以支援直觀的 Web Request 請求。 | `common/types.go`, `common/Types.cs` 更新 | ✅ 已完成 |
 
 ### 階段五：基礎 UI (15)
 
