@@ -1,3 +1,5 @@
 **/.idea/*
 
 vender/
+common/proto_case_study/GamerInfo.proto
+common/proto_case_study/SystemDefine.proto

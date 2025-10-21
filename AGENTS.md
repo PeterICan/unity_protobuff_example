@@ -55,26 +55,44 @@
 | # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- |
 | 10 | **設定 antnet WebSocket 端點** | 更新 `server/main.go`，新增 WebSocket 監聽埠並使用 JSON 解析器 | `server/main.go` 更新 | ✅ 已完成 |
-| 11 | **實作 JSONSerializer** | 在 `Client/Scripts/` 中實作 `JSONSerializer.cs`，處理 JSON 格式序列化 (JSON Schema 檔案位於 `common/json_schema/position.schema.json`；Client 端將使用 `NJsonSchema` 從 JSON Schema 生成 C# 類別；Go 後端將使用 `omissis/go-jsonschema` 從 JSON Schema 生成結構體) | `Client/Scripts/JSONSerializer.cs` | ▶️ 進行中 |
-| 12 | **實作 WebSocketClientTransport** | 在 `Client/Scripts/` 中實作 `WebSocketClientTransport.cs`，連接到 antnet 的 WebSocket 端點 | `Client/Scripts/WebSocketClientTransport.cs` | ⏹️ 未開始 |
-| 13 | **進行 WebSocket/JSON 位置測試** | 測試 Client 發送位置更新，Server 處理並廣播的完整 WebSocket 流程 | 功能可運作 | ⏹️ 未開始 |
+| 11 | **實作 JSONSerializer** | 在 `Client/Scripts/` 中實作 `JSONSerializer.cs`，處理 JSON 格式序列化 (JSON Schema 檔案位於 `common/json_schema/position.schema.json`；Client 端將使用 `NJsonSchema` 從 JSON Schema 生成 C# 類別；Go 後端將使用 `omissis/go-jsonschema` 從 JSON Schema 生成結構體) | `Client/Scripts/JSONSerializer.cs` | ✅ 已完成 |
+| 12 | **實作 WebSocketClientTransport** | 在 `Client/Scripts/` 中實作 `WebSocketClientTransport.cs`，連接到 antnet 的 WebSocket 端點 | `Client/Scripts/WebSocketClientTransport.cs` | ✅ 已完成 |
+| 13 | **進行 WebSocket/JSON 位置測試** | 測試 Client 發送位置更新，Server 處理並廣播的完整 WebSocket 流程 | 功能可運作 | ✅ 已完成 |
 
-### 階段四：基礎 UI (14)
-
-| # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
-| :--- | :--- | :--- | :--- | :--- |
-| 14 | **實作基礎 Viewer 介面** | 建立簡化的 `NetworkViewer.cs`，專注於位置更新功能的 UI 介面測試 | `Client/Scripts/NetworkViewer.cs` | ⏹️ 未開始 |
-
-### 階段五：登入功能 (15-17) - *延後執行*
+### 階段四：通訊指令碼定義 (14)
 
 | # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- |
-| 15 | **定義登入資料模型** | 在 common 中定義 `UserCredentials`、`LoginResponse` 等登入相關資料結構 | 更新 `common/types.go`, `common/Types.cs` | ⏹️ 未開始 |
-| 16 | **建立登入處理 Handler** | 建立 `server/handlers/login.go`，處理登入驗證的業務邏輯 | `server/handlers/login.go` | ⏹️ 未開始 |
-| 17 | **完整 Unity Client Viewer 介面** | 擴展 NetworkViewer，新增登入驗證功能和完整的 UI 測試介面 | `Client/Scripts/NetworkViewer.cs` 更新 | ⏹️ 未開始 |
+| 14 | **為 WebSocket 定義獨立指令碼** | 為了讓 WebSocket 的路由與 Protobuf/TCP 分離，在 `common` 中為 JSON/WebSocket 模式定義一組獨立的 `Cmd` 和 `Act`。其封包欄位設計需要對 HTTP Web Request 友好，以支援直觀的 Web Request 請求。 | `common/types.go`, `common/Types.cs` 更新 | ⏹️ 未開始 |
 
-### 階段六：最終整合 (18)
+### 階段五：基礎 UI (15)
 
 | # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- |
-| 18 | **整合測試和最終驗證** | 進行完整的雙重抽象架構測試，確認所有功能（位置+登入）正常運作 | 功能可運作 | ⏹️ 未開始 |
+| 15 | **實作基礎 Viewer 介面** | 建立簡化的 `NetworkViewer.cs`，專注於位置更新功能的 UI 介面測試 | `Client/Scripts/NetworkViewer.cs` | ⏹️ 未開始 |
+
+### 階段六：登入功能 (16-18) - *延後執行*
+
+| # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- |
+| 16 | **定義登入資料模型** | 在 common 中定義 `UserCredentials`、`LoginResponse` 等登入相關資料結構 | 更新 `common/types.go`, `common/Types.cs` | ⏹️ 未開始 |
+| 17 | **建立登入處理 Handler** | 建立 `server/handlers/login.go`，處理登入驗證的業務邏輯 | `server/handlers/login.go` | ⏹️ 未開始 |
+| 18 | **完整 Unity Client Viewer 介面** | 擴展 NetworkViewer，新增登入驗證功能和完整的 UI 測試介面 | `Client/Scripts/NetworkViewer.cs` 更新 | ⏹️ 未開始 |
+
+### 階段七：最終整合 (19)
+
+| # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- |
+| 19 | **整合測試和最終驗證** | 進行完整的雙重抽象架構測試，確認所有功能（位置+登入）正常運作 | 功能可運作 | ⏹️ 未開始 |
+
+### 階段八：實作 request_id (20)
+
+| # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- |
+| 20 | **實作 request_id 的生成與處理** | 在客戶端生成唯一的 `request_id` 並包含在 C2S 訊息中，伺服器將其回傳於 S2C 訊息。客戶端利用 `request_id` 關聯請求與回應。此功能將在基礎功能穩定後實作。 | Client/Server 程式碼更新，`request_id` 欄位啟用。 | ⏹️ 未開始 |
+
+### 階段九：架構重構 (21)
+
+| # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- |
+| 21 | **JSON 序列化流程重構** | 修正 JSON 序列化流程，使其使用獨立的資料模型 (POCO 或從 JSON Schema 生成)，以符合「雙重解耦」的架構目標，解決目前對 Protobuf 生成類別的依賴問題。(時間允許下才會進行) | `Client/Scripts/JSONSerializer.cs` 更新 | ⏹️ 未開始 |
