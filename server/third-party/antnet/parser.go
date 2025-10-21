@@ -112,7 +112,8 @@ func (r *Parser) Get() IParser {
 			r.parser = &MsgpackParser{Parser: r}
 		}
 	case ParserTypeCustom:
-		return nil
+		// For custom parser, r.parser is already set externally
+		return r.parser
 	case ParserTypeRaw:
 		return nil
 	}
@@ -213,4 +214,9 @@ func (r *Parser) RegisterMsg(c2s interface{}, s2c interface{}) {
 	}
 
 	r.RegisterMsgFunc(c2sFunc, s2cFunc)
+}
+
+// SetIParser allows setting the internal IParser for custom types.
+func (r *Parser) SetIParser(p IParser) {
+	r.parser = p
 }
