@@ -3,8 +3,7 @@ package handlers
 import (
 	"encoding/json" // ADD THIS
 	"fmt"
-	"proto_buffer_example/server/generated/json_api" // Import our new generate
-	"proto_buffer_example/server/generated/json_api" // Import our new generated types
+	"proto_buffer_example/server/generated/json_api" // Import our new generate // Import our new generated types
 	"proto_buffer_example/server/third-party/antnet"
 )
 
