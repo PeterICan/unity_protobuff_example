@@ -1,0 +1,12 @@
+syntax = "proto3";
+package json_api;
+
+option go_package = "/.;json_api";
+
+// --- 通用結構 ---
+
+// 標準的錯誤回應格式
+message ErrorResponse {
+  int32 code = 1;       // 錯誤碼 (例如 400, 404, 500)
+  string message = 2;   // 給開發者看的錯誤訊息
+}

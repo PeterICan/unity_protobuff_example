@@ -3,6 +3,8 @@ package json_api;
 
 option go_package = "/.;json_api";
 
+import "json_api/common.api.proto"; // Add this import
+
 // 說明：
 // 這個 .proto 檔案定義了 JSON/WebSocket API 的訊息結構。
 // 每個 C2S 訊息都包含路由和請求 ID，以便後端進行解析和路由。
@@ -11,7 +13,7 @@ option go_package = "/.;json_api";
 // C2S JSON 結構範例:
 // {
 //   "route": "position/update",
-//   "request_id": "client-generated-uuid-123",
+//   // "request_id": "client-generated-uuid-123", // commented out
 //   "x": 10.5,
 //   "y": 20.0,
 //   "z": 5.1
@@ -20,19 +22,10 @@ option go_package = "/.;json_api";
 // S2C JSON 結構範例:
 // {
 //   "route": "position/update",
-//   "request_id": "client-generated-uuid-123",
+//   // "request_id": "client-generated-uuid-123", // commented out
 //   "status": "success",
 //   "error": null
 // }
-
-
-// --- 通用結構 ---
-
-// 標準的錯誤回應格式
-message ErrorResponse {
-  int32 code = 1;       // 錯誤碼 (例如 400, 404, 500)
-  string message = 2;   // 給開發者看的錯誤訊息
-}
 
 
 // System: position
