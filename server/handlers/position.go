@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"encoding/json" // ADD THIS
 	"fmt"
 	"proto_buffer_example/server/generated"
+	"proto_buffer_example/server/generated/json_api"
 	"proto_buffer_example/server/third-party/antnet"
 )
 
@@ -34,4 +36,39 @@ func (h *PositionHandler) HandlePositionCmdUpdate(msgque antnet.IMsgQue, msg *an
 
 	return true
 
+}
+
+func (h *PositionHandler) HandleC2SPositionUpdate(msgque antnet.IMsgQue, msg *antnet.Message) bool {
+	c2sMsg, ok := msg.C2S().(*json_api.C2SPositionUpdate)
+	if !ok {
+		fmt.Printf("Error: Received message is not of type C2SPositionUpdate\n")
+		return false
+	}
+
+	fmt.Printf("Received PositionUpdate request. Route: %s, X: %f, Y: %f, Z: %f\n", c2sMsg.Route, c2sMsg.X, c2sMsg.Y, c2sMsg.Z)
+
+	// Create the correct response object
+	response := &json_api.S2CPositionUpdate{
+		Route:  c2sMsg.Route, // Echo back the route
+		Status: "success",
+		Error:  nil, // No error
+	}
+
+	// Manually marshal the response object to JSON bytes
+	jsonData, err := json.Marshal(response)
+	if err != nil {
+		fmt.Printf("Error marshalling response to JSON: %v\n", err)
+		return false
+	}
+
+	// Create antnet.Message with the JSON data and no header
+	antnetMsg := &antnet.Message{
+		Data: jsonData,
+		Head: nil, // Explicitly set Head to nil for WebSocket JSON
+	}
+
+	// Send the response back to the client
+	msgque.Send(antnetMsg)
+
+	return true
 }
