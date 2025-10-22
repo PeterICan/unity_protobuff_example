@@ -109,6 +109,14 @@
 
 | 15 | **實作自定義 JSON 路由解析器** | 為了避免 `antnet` 內建 `JsonParser` 的「型別猜測」性能問題，實作 `server/parser/json_route_parser.go`，並修改 `antnet` 原始碼以支援其整合。 | `server/parser/json_route_parser.go`，`server/third-party/antnet/parser.go` 修改，`server/ws_server.go` 更新。 | ✅ 已完成 |
 
+### 階段四點五：發布準備 (15.1-15.3)
+
+| # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- |
+| 15.1 | **生成 Unity Client 執行檔** | 建置 Unity Client 專案，生成可執行的應用程式。 | `Client/Builds/` 下的執行檔 | ✅ 已完成 |
+| 15.2 | **生成 Go Server 執行檔** | 編譯 Go Server 專案，生成可執行的伺服器程式。已建立 `server/build_server.bat` 腳本來自動化此過程。 | `server/server_executable` | ✅ 已完成 |
+| 15.3 | **建立 Docker Compose 配置** | 編寫 `docker-compose.yml` 文件，用於部署和管理 Server。 | `docker-compose.yml` | ⏹️ 未開始 |
+
 ### 階段五：基礎 UI (16)
 
 | # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
@@ -140,3 +148,30 @@
 | # | 任務 | 描述 | 預期輸出檔案 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- |
 | 22 | **JSON 序列化流程重構** | 修正 JSON 序列化流程，使其使用獨立的資料模型 (POCO 或從 JSON Schema 生成)，以符合「雙重解耦」的架構目標，解決目前對 Protobuf 生成類別的依賴問題。(時間允許下才會進行) | `Client/Scripts/JSONSerializer.cs` 更新 | ⏹️ 未開始 |
+
+---
+
+## 應用提案：網路狀態與互動演示 (Network Status & Interaction Demo)
+
+**1. 應用類型**：Unity UI 應用
+
+**2. 核心功能**：
+
+*   **連線狀態顯示**：
+    *   一個文字標籤，實時顯示與伺服器的連線狀態（例如：「已連線」、「未連線」、「連線中...」）。
+*   **位置更新功能**：
+    *   一個「發送位置更新」按鈕。點擊後，客戶端會生成一組隨機的 X, Y, Z 座標，並透過 `C2SPositionUpdate` 訊息發送給伺服器。
+    *   一個文字標籤，顯示最後一次發送的位置數據。
+    *   一個文字標籤，顯示從伺服器接收到的 `S2CPositionUpdate` 回應狀態（例如：「位置更新成功」）。
+*   **玩家資訊查詢功能**：
+    *   一個「查詢玩家資訊」按鈕。點擊後，客戶端會發送 `C2SGamerInfoRetrieve` 訊息給伺服器。
+    *   多個文字標籤，顯示從伺服器接收到的 `S2CGamerInfoRetrieve` 訊息中的玩家資訊（例如：暱稱、等級、金錢、寶石）。
+*   **日誌輸出面板**：
+    *   一個可滾動的文字區域，顯示所有發送和接收到的網路訊息（JSON 格式），以及重要的連線事件日誌。
+
+**3. 互動方式**：
+*   所有功能都透過 UI 上的按鈕點擊來觸發。
+
+**4. 視覺風格**：
+*   使用 Unity UI (UGUI) 的基礎元件，例如 `Button`、`Text`、`Scroll Rect`。
+*   整體介面簡潔，幾片面板即可，無需複雜的視覺設計。

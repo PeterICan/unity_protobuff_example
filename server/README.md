@@ -67,3 +67,20 @@
     * **預設埠號：8081** (與 TCP 模式區分)。
 
 ---
+
+## 建置 Go Server 執行檔
+
+您可以透過 `server/build_server.bat` 腳本自動建置 Go Server 執行檔。
+
+**主要功能：**
+
+*   **自動導航：** 腳本會自動切換到其所在目錄，確保建置過程中的路徑正確性。
+*   **執行 `go build`：** 使用 `go build -o server_executable main.go` 命令生成執行檔。
+
+**使用方式：**
+
+1.  **執行建置腳本：** 從專案的**根目錄**執行：
+    ```bash
+    server\build_server.bat
+    ```
+2.  **檢查輸出：** 成功建置後，可執行檔將位於 `server/server_executable`。
