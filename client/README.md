@@ -56,3 +56,23 @@
 3.  **運行：** 在 Unity Editor 中運行主場景。
 
 ---
+
+## 建置 Unity Client 執行檔
+
+您可以透過專案根目錄下的 `client/build_project.bat` 腳本自動建置 Unity Client 執行檔。
+
+**主要功能：**
+
+*   **自動偵測 Unity 版本：** 腳本會從 `ProjectSettings/ProjectVersion.txt` 中讀取專案所需的 Unity 編輯器版本。
+*   **驗證 Unity 編輯器路徑：** 確保安裝了正確版本的 Unity 編輯器。
+*   **批次模式建置：** 在沒有圖形介面的情況下執行 Unity 建置，適合自動化流程。
+*   **輸出日誌：** 建置過程中的日誌會輸出到 `build_log.txt`。
+
+**使用方式：**
+
+1.  **安裝 Unity 編輯器：** 確保透過 Unity Hub 安裝了與專案 `ProjectSettings/ProjectVersion.txt` 中指定版本相符的 Unity 編輯器。
+2.  **執行建置腳本：** 從專案的**根目錄**執行：
+    ```bash
+    client\build_project.bat
+    ```
+3.  **檢查輸出：** 成功建置後，可執行檔將位於 `Client/Builds/` 目錄下。
