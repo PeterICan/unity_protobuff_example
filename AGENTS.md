@@ -115,7 +115,7 @@
 | :--- | :--- | :--- | :--- | :--- |
 | 15.1 | **生成 Unity Client 執行檔** | 建置 Unity Client 專案，生成可執行的應用程式。 | `Client/Builds/` 下的執行檔 | ✅ 已完成 |
 | 15.2 | **生成 Go Server 執行檔** | 編譯 Go Server 專案，生成可執行的伺服器程式。已建立 `server/build_server.bat` 腳本來自動化此過程。 | `server/server_executable` | ✅ 已完成 |
-| 15.3 | **建立 Docker Compose 配置** | 編寫 `docker-compose.yml` 文件，用於部署和管理 Server。 | `docker-compose.yml` | ⏹️ 未開始 |
+| 15.3 | **建立 Docker Compose 配置** | 已建立 `server/Dockerfile` 和 `server/docker-compose.yml` 文件，用於建置和部署 Server。 | `server/docker-compose.yml` | ✅ 已完成 |
 
 ### 階段五：基礎 UI (16)
 

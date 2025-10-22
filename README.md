@@ -48,6 +48,41 @@ Go Server 的建置過程已透過 `server/build_server.bat` 腳本自動化。
     ```
 4.  建置完成後，可執行檔將位於 `server/server_executable`。
 
+### 使用 Docker Compose 部署 Go Server
+
+您可以使用 Docker Compose 來建置 Docker 映像並啟動 Go Server 服務。
+
+**前置條件：**
+
+*   已安裝 Docker Desktop 或 Docker Engine。
+
+**使用方式：**
+
+1.  **建置並啟動服務：**
+    從專案的**根目錄**執行以下命令：
+    ```bash
+    server\build_docker_compose.bat
+    ```
+    此腳本會建置 Docker 映像並以後台模式 (`-d`) 啟動服務。
+
+2.  **查看服務狀態：**
+    從專案的**根目錄**執行：
+    ```bash
+    docker-compose -f server/docker-compose.yaml ps
+    ```
+
+3.  **查看服務日誌：**
+    從專案的**根目錄**執行：
+    ```bash
+    docker-compose -f server/docker-compose.yaml logs -f
+    ```
+
+4.  **停止並移除服務：**
+    從專案的**根目錄**執行：
+    ```bash
+    docker-compose -f server/docker-compose.yaml down
+    ```
+
 ## ▶️ 快速啟動指南
 
 Server 端請參考 **`Server/README.md`**，Client 端請參考 **`Client/README.md`**，以確定當前要測試的模式及啟動方式。

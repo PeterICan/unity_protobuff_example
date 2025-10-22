@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6666:6666" # TCP server port
+      - "7777:7777" # WebSocket server port
+    command: ["./server_executable", "--serverType", "ws"]
+    # You can override the command to run TCP server like this:
+    # command: ["./server_executable", "--serverType", "tcp"]

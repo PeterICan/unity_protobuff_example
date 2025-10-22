@@ -7,10 +7,12 @@
 ## 核心設計理念：雙重抽象
 
 ### 1. 服務層 (Service Layer)
+
 * **目標：** 核心業務邏輯（例如處理登入請求）僅與**統一的 Go Structs** 互動，完全隔離於 Protobuf 或 JSON 格式。
 * **關鍵：** 業務邏輯不應包含任何網路 I/O 或序列化/反序列化程式碼。
 
 ### 2. 協定層 (Protocol Layer)
+
 * **`IConnection` 介面：** 定義抽象的發送/接收機制，讓上層業務邏輯得以呼叫。
 * **`ISerializer` 介面：** 定義抽象的序列化/反序列化介面，具體實作可以是 `ProtobufSerializer` 或 `JSONSerializer`。
 
@@ -29,15 +31,19 @@
 
 ### ▶️ 啟動步驟 (模式 I)
 
-1.  **進入 Server 目錄：**
+1. **進入 Server 目錄：**
+
     ```bash
     cd Server
     ```
-2.  **啟動伺服器：**
+
+2. **啟動伺服器：**
     * 假設 `main.go` 中已配置啟動 TCP 模式的邏輯。
+
     ```bash
     go run main.go --mode=tcp
     ```
+
     * **預設埠號：8080**。
 
 ---
@@ -55,15 +61,19 @@
 
 ### ▶️ 啟動步驟 (模式 II)
 
-1.  **進入 Server 目錄：**
+1. **進入 Server 目錄：**
+
     ```bash
     cd Server
     ```
-2.  **啟動伺服器：**
+
+2. **啟動伺服器：**
     * 假設 `main.go` 中已配置啟動 HTTP 模式的邏輯。
+
     ```bash
     go run main.go --mode=http --port=8081
     ```
+
     * **預設埠號：8081** (與 TCP 模式區分)。
 
 ---
@@ -74,13 +84,52 @@
 
 **主要功能：**
 
-*   **自動導航：** 腳本會自動切換到其所在目錄，確保建置過程中的路徑正確性。
-*   **執行 `go build`：** 使用 `go build -o server_executable main.go` 命令生成執行檔。
+* **自動導航：** 腳本會自動切換到其所在目錄，確保建置過程中的路徑正確性。
+* **執行 `go build`：** 使用 `go build -o server_executable main.go` 命令生成執行檔。
 
 **使用方式：**
 
-1.  **執行建置腳本：** 從專案的**根目錄**執行：
+1. **執行建置腳本：** 從專案的**根目錄**執行：
+
     ```bash
     server\build_server.bat
     ```
-2.  **檢查輸出：** 成功建置後，可執行檔將位於 `server/server_executable`。
+
+2. **檢查輸出：** 成功建置後，可執行檔將位於 `server/server_executable`。
+
+## 使用 Docker Compose 部署
+
+您可以使用 Docker Compose 來建置 Docker 映像並啟動 Go Server 服務。
+
+**前置條件：**
+
+* 已安裝 Docker Desktop 或 Docker Engine。
+
+**使用方式：**
+
+1. **建置並啟動服務：**
+    從 `server` 目錄執行以下命令：
+
+    ```bash
+    .\build_docker_compose.bat
+    ```
+
+    此腳本會建置 Docker 映像並以後台模式 (`-d`) 啟動服務。
+
+2. **查看服務狀態：**
+
+    ```bash
+    docker-compose ps
+    ```
+
+3. **查看服務日誌：**
+
+    ```bash
+    docker-compose logs -f
+    ```
+
+4. **停止並移除服務：**
+
+    ```bash
+    docker-compose down
+    ```
