@@ -15,6 +15,8 @@ namespace ProtoBufferExample.Client
         private bool _isConnected;
 
         public event Action<byte[]> OnMessageReceived;
+        public event Action<bool> OnConnectionStatusChanged; // Implements IConnection event
+
         public bool IsConnected => _isConnected;
 
         public async void Connect(string address, int port)
@@ -34,6 +36,7 @@ namespace ProtoBufferExample.Client
                 UnityEngine.Debug.Log($"Connecting to WebSocket: {uri}");
                 await _webSocket.ConnectAsync(uri, _cancellationTokenSource.Token);
                 _isConnected = true;
+                OnConnectionStatusChanged?.Invoke(true); // Notify successful connection
                 UnityEngine.Debug.Log("WebSocket connected.");
 
                 // Start listening for messages
@@ -43,13 +46,15 @@ namespace ProtoBufferExample.Client
             {
                 UnityEngine.Debug.LogError($"WebSocket connection error: {e.Message}");
                 _isConnected = false;
-                Disconnect();
+                OnConnectionStatusChanged?.Invoke(false); // Notify connection failure
+                Disconnect(); // Ensure cleanup
             }
             catch (Exception e)
             {
                 UnityEngine.Debug.LogError($"General connection error: {e.Message}");
                 _isConnected = false;
-                Disconnect();
+                OnConnectionStatusChanged?.Invoke(false); // Notify connection failure
+                Disconnect(); // Ensure cleanup
             }
         }
 
@@ -78,6 +83,7 @@ namespace ProtoBufferExample.Client
             _webSocket?.Dispose();
             _webSocket = null;
             _isConnected = false;
+            OnConnectionStatusChanged?.Invoke(false); // Notify disconnection
             UnityEngine.Debug.Log("WebSocket disconnected.");
         }
 
@@ -96,7 +102,7 @@ namespace ProtoBufferExample.Client
             catch (Exception e)
             {
                 UnityEngine.Debug.LogError($"Error sending data over WebSocket: {e.Message}");
-                Disconnect();
+                Disconnect(); // Disconnect will also invoke OnConnectionStatusChanged(false)
             }
         }
 
@@ -113,6 +119,7 @@ namespace ProtoBufferExample.Client
                     {
                         UnityEngine.Debug.Log("WebSocket received close message from server.");
                         await _webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Server initiated close", _cancellationTokenSource.Token);
+                        // Disconnect() will be called, which invokes OnConnectionStatusChanged(false)
                         Disconnect();
                         break;
                     }
@@ -149,7 +156,7 @@ namespace ProtoBufferExample.Client
             }
             finally
             {
-                if (_isConnected) // If still connected, means an error occurred, so disconnect
+                if (_isConnected) 
                 {
                     Disconnect();
                 }

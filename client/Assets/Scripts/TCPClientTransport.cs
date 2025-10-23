@@ -12,6 +12,7 @@ namespace ProtoBufferExample.Client
         private bool _isConnected;
 
         public event Action<byte[]> OnMessageReceived;
+        public event Action<bool> OnConnectionStatusChanged; // Implements IConnection event
 
         public bool IsConnected => _isConnected;
 
@@ -27,6 +28,7 @@ namespace ProtoBufferExample.Client
                 _tcpClient = new TcpClient(address, port);
                 _stream = _tcpClient.GetStream();
                 _isConnected = true;
+                OnConnectionStatusChanged?.Invoke(true); // Notify successful connection
 
                 _receiveThread = new Thread(ReceiveLoop);
                 _receiveThread.IsBackground = true;
@@ -38,6 +40,7 @@ namespace ProtoBufferExample.Client
             {
                 UnityEngine.Debug.LogError($"Failed to connect to server: {e.Message}");
                 _isConnected = false;
+                OnConnectionStatusChanged?.Invoke(false); // Notify connection failure
             }
         }
 
@@ -49,6 +52,7 @@ namespace ProtoBufferExample.Client
             }
 
             _isConnected = false;
+            OnConnectionStatusChanged?.Invoke(false); // Notify disconnection
             _receiveThread?.Join();
             _stream?.Close();
             _tcpClient?.Close();
@@ -71,7 +75,7 @@ namespace ProtoBufferExample.Client
             catch (Exception e)
             {
                 UnityEngine.Debug.LogError($"Failed to send data: {e.Message}");
-                Disconnect();
+                Disconnect(); // Disconnect will also invoke OnConnectionStatusChanged(false)
             }
         }
 
@@ -97,6 +101,7 @@ namespace ProtoBufferExample.Client
                         {
                             // Server disconnected
                             _isConnected = false;
+                            OnConnectionStatusChanged?.Invoke(false); // Notify unexpected disconnection
                             break;
                         }
                         bytesRead += read;
@@ -118,6 +123,7 @@ namespace ProtoBufferExample.Client
                         {
                             // Server disconnected
                             _isConnected = false;
+                            OnConnectionStatusChanged?.Invoke(false); // Notify unexpected disconnection
                             break;
                         }
                         bytesRead += read;
@@ -138,10 +144,22 @@ namespace ProtoBufferExample.Client
                     {
                         UnityEngine.Debug.LogError($"Error receiving data: {e.Message}");
                         _isConnected = false;
+                        OnConnectionStatusChanged?.Invoke(false); // Notify error-induced disconnection
                     }
                 }
             }
-            Disconnect();
+            // Ensure Disconnect is called to clean up resources,
+            // but avoid double-invoking OnConnectionStatusChanged if already done.
+            if (_isConnected) // If still connected here, means loop broke for some reason, ensure disconnect
+            {
+                Disconnect();
+            }
+            else // If already disconnected, just clean up
+            {
+                _receiveThread?.Join();
+                _stream?.Close();
+                _tcpClient?.Close();
+            }
         }
     }
 }

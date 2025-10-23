@@ -8,6 +8,7 @@ namespace ProtoBufferExample.Client
         void Disconnect();
         void Send(byte[] data);
         event Action<byte[]> OnMessageReceived;
-        bool IsConnected { get; }
+        event Action<bool> OnConnectionStatusChanged; // New: Notify about connection status changes
+        bool IsConnected { get; } 
     }
 }
