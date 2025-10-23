@@ -120,6 +120,8 @@ namespace ProtoBufferExample.Client.Views
             if (_logScrollRect != null)
             {
                 LayoutRebuilder.ForceRebuildLayoutImmediate(_logContentParent);
+                var textCount = _logContentParent.childCount;
+                _logContentParent.sizeDelta = new Vector2(_logContentParent.sizeDelta.x, 30f * textCount);
                 _logScrollRect.verticalNormalizedPosition = 0f;
             }
         }
