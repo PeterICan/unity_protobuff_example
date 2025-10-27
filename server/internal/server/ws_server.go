@@ -3,10 +3,10 @@ package server
 import (
 	"fmt"
 	"proto_buffer_example/server/generated/json_api"
+	"proto_buffer_example/server/internal/player/container"
 	"proto_buffer_example/server/internal/proto/handlers"
-	"proto_buffer_example/server/internal/proto/parser"
-
 	"proto_buffer_example/server/third-party/antnet"
+	customize "proto_buffer_example/server/tools/customize"
 )
 
 // --- WebSocket Server Implementation ---
@@ -14,8 +14,9 @@ import (
 // webSocketServer implements the Server interface for WebSocket connections.
 type webSocketServer struct {
 	addr       string
-	msgHandler *handlers.MsgHandler
+	msgHandler *customize.MsgHandler
 	msgParser  *antnet.Parser // Revert type to *antnet.Parser
+	container.GamerContainer
 }
 
 // NewWebSocketServer creates and configures a WebSocket server.
@@ -26,7 +27,7 @@ func NewWebSocketServer(addr string) Server {
 	baseParser.ErrType = antnet.ParseErrTypeSendRemind // Example error handling
 
 	// Instantiate our custom parser
-	jsonRouteParser := parser.NewJsonRouteParser(baseParser)
+	jsonRouteParser := customize.NewJsonRouteParser(baseParser)
 
 	// Set the custom parser using the new public setter
 	baseParser.SetIParser(jsonRouteParser) // Use the new setter
@@ -34,14 +35,14 @@ func NewWebSocketServer(addr string) Server {
 	// Register C2S and S2C message types with our custom parser
 	// Get the custom parser instance via the public Get() method
 	customIParser := baseParser.Get()
-	customJsonParser, ok := customIParser.(*parser.JsonRouteParser)
+	customJsonParser, ok := customIParser.(*customize.JsonRouteParser)
 	if !ok {
 		panic("Failed to cast IParser to *parser.JsonRouteParser")
 	}
 	customJsonParser.RegisterMsg("position/update", &json_api.C2SPositionUpdate{}, &json_api.S2CPositionUpdate{})
 	customJsonParser.RegisterMsg("gamer_info/retrieve", &json_api.C2SGamerInfoRetrieve{}, &json_api.S2CGamerInfoRetrieve{})
 	// 2. Initialize the message handler
-	msgHandler := &handlers.MsgHandler{}
+	msgHandler := &customize.MsgHandler{}
 	positionHandler := &handlers.PositionHandler{}
 	gamerInfoHandler := &handlers.GamerInfoHandler{}
 
@@ -58,5 +59,7 @@ func NewWebSocketServer(addr string) Server {
 
 func (s *webSocketServer) StartServer() error {
 	fmt.Printf("Starting antnet WebSocket server on %s with Custom JSON Route parser\n", s.addr)
-	return antnet.StartServer(s.addr, antnet.MsgTypeCmd, s.msgHandler, s.msgParser)
+	s.InitWebSocketServerBase(3345678, s.addr)
+	return nil
+	//return antnet.StartServer(s.addr, antnet.MsgTypeCmd, s.msgHandler, s.msgParser)
 }
