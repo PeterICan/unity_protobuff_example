@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	server "proto_buffer_example/server/internal/server"
 	"proto_buffer_example/server/third-party/antnet"
 )
 
@@ -11,13 +12,13 @@ func main() {
 	serverType := "ws"
 	// -------------------
 
-	var server Server
+	var runServer server.Server
 
 	switch serverType {
 	case "tcp":
-		server = NewTcpServer("tcp://:6666")
+		runServer = server.NewTcpServer("tcp://:6666")
 	case "ws":
-		server = NewWebSocketServer("ws://:7777/ws")
+		runServer = server.NewWebSocketServer("ws://:7777/ws")
 	default:
 		fmt.Printf("Unknown server type: %s\n", serverType)
 		return
@@ -27,7 +28,7 @@ func main() {
 	// The Start() method is blocking, so we run it in a goroutine
 	// to allow WaitForSystemExit to catch the shutdown signal.
 	go func() {
-		if err := server.Start(); err != nil {
+		if err := runServer.StartServer(); err != nil {
 			fmt.Printf("Failed to start server: %v\n", err)
 			panic(err)
 		}

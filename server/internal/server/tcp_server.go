@@ -1,9 +1,10 @@
-package main
+package server
 
 import (
 	"fmt"
+
 	"proto_buffer_example/server/generated"
-	"proto_buffer_example/server/handlers"
+	"proto_buffer_example/server/internal/proto/handlers"
 	"proto_buffer_example/server/third-party/antnet"
 )
 
@@ -43,7 +44,7 @@ func NewTcpServer(addr string) Server {
 	}
 }
 
-func (s *tcpServer) Start() error {
+func (s *tcpServer) StartServer() error {
 	fmt.Printf("Starting antnet TCP server on %s with Protobuf parser\n", s.addr)
 	return antnet.StartServer(s.addr, antnet.MsgTypeMsg, s.msgHandler, s.msgParser)
 }

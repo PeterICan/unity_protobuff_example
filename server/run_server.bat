@@ -1,3 +1,3 @@
 @echo off
 cd /d "%~dp0"
-go run main.go
+go run internal/main.go

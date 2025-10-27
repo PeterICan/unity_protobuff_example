@@ -1,11 +1,11 @@
-package main
+package server
 
 import (
 	"fmt"
 	"proto_buffer_example/server/generated/json_api"
+	"proto_buffer_example/server/internal/proto/handlers"
+	"proto_buffer_example/server/internal/proto/parser"
 
-	"proto_buffer_example/server/handlers"
-	"proto_buffer_example/server/parser"
 	"proto_buffer_example/server/third-party/antnet"
 )
 
@@ -56,7 +56,7 @@ func NewWebSocketServer(addr string) Server {
 	}
 }
 
-func (s *webSocketServer) Start() error {
+func (s *webSocketServer) StartServer() error {
 	fmt.Printf("Starting antnet WebSocket server on %s with Custom JSON Route parser\n", s.addr)
 	return antnet.StartServer(s.addr, antnet.MsgTypeCmd, s.msgHandler, s.msgParser)
 }
