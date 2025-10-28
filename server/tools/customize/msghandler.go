@@ -2,6 +2,7 @@ package customize
 
 import (
 	"fmt"
+	"proto_buffer_example/server/internal/persistence"
 	"proto_buffer_example/server/third-party/antnet"
 )
 
@@ -24,7 +25,8 @@ func (p *MsgHandler) SetStopFunc(callbackFunc MsgStopFunc) {
 
 func (p *MsgHandler) OnNewMsgQue(msgque antnet.IMsgQue) bool {
 	//log.Info(ctx, "----- OnNewMsgQue GetUser:%d", msgque.GetUser())
-	fmt.Println("TODO 這邊建立新玩家")
+	nextGamerId := persistence.GetNextGamerId()
+	fmt.Println("OnNewMsgQue create new gamer with id:", nextGamerId)
 	return true
 }
 
