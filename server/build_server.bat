@@ -4,7 +4,7 @@ SET SCRIPT_DIR=%~dp0
 pushd %SCRIPT_DIR%
 
 ECHO Building Go server executable...
-go build -o server_executable.exe
+go build -o server_executable.exe internal/main.go
 
 IF %ERRORLEVEL% NEQ 0 (
     ECHO Error: Go build failed!
