@@ -59,6 +59,7 @@ func NewWebSocketServer(addr string) Server {
 
 func (s *webSocketServer) StartServer() error {
 	fmt.Printf("Starting antnet WebSocket server on %s with Custom JSON Route parser\n", s.addr)
+	s.InitGamerContainer(3345678)
 	s.InitWebSocketServerBase(3345678, s.addr)
 	return nil
 	//return antnet.StartServer(s.addr, antnet.MsgTypeCmd, s.msgHandler, s.msgParser)

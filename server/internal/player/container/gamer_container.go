@@ -2,7 +2,10 @@ package container
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"proto_buffer_example/server/internal/mediator"
+	"proto_buffer_example/server/internal/persistence"
 	"proto_buffer_example/server/internal/player"
 	"proto_buffer_example/server/internal/player/interface/igamer"
 	"proto_buffer_example/server/third-party/antnet"
@@ -58,7 +61,7 @@ func (p *GamerContainer) AttachGamerContainer(ctx context.Context, gamer igamer.
 	p.registerMsgqueGroup(ctx, gamer)
 
 	//通知各子系統去載入該玩家的資料
-	p.onGamerLoadFromDB(ctx, gamer)
+	//p.onGamerLoadFromDB(ctx, gamer)
 
 	//如果玩家是新創帳號時，觸發所有子系統的創建玩家事件
 	if firstTimeLogin {
@@ -114,6 +117,7 @@ func (p *GamerContainer) RemoveContainerGamer(gamerId uint64) {
 	} else {
 		p.GamerQuitProcess(ctx, gamer)
 	}
+	fmt.Println("移除玩家連線 RemoveContainerGamer gamer:", gamerId)
 	//log.Info(ctx, "RemoveContainerGamer gamer:%d", gamerId)
 
 	p.mapLock.Lock()
@@ -234,36 +238,38 @@ func (p *GamerContainer) CallGamerFunc(f func(gamer igamer.IGamer)) {
 //	return true, gamer
 //}
 
-//TODO: 新玩家創建資料 自己寫一個不用 accountData idata.IAccount 的介面
+func (p *GamerContainer) NewGamerInitData(msgque antnet.IMsgQue) igamer.IGamer {
+	nextGamerId := persistence.GetNextGamerId()
+	ctx := context.Background()
+	//新玩家登入
+	gamer := player.CreateGamer(nextGamerId, p.serverId)
+	if gamer == nil {
+		log.Panic(ctx, "NewGamerInitData gamer:%d", gamer.GetGamerId())
+	}
+	//log.Info(ctx, "NewGamerInitData gamer:%d", gamer.GetGamerId())
 
-//func (p *GamerContainer) NewGamerInitData(accountData idata.IAccount, loginInfo *proto.Login_ClientLoginInfo) igamer.IGamer {
-//	ctx := context.Background()
-//	//新玩家登入
-//	gamer := player.CreateGamer(accountData, p.serverId)
-//	if gamer == nil {
-//		log.Panic(ctx, "NewGamerInitData gamer:%d", gamer.GetGamerId())
-//	}
-//	log.Info(ctx, "NewGamerInitData gamer:%d", gamer.GetGamerId())
-//
-//	// 這三個參數以login-server賦值為準
-//	//gamer.GetAccountData().SetUUID(loginInfo.Uuid)
-//	//gamer.GetAccountData().SetLoginWay(loginInfo.LoginWay)
-//	//gamer.GetAccountData().SetOpenId(loginInfo.OpenId)
-//	gamer.GetAccountData().SetRegisterTime()
-//	gamer.GetAccountData().CheckFirstTimeLoginGameServer(ctx, p.serverId)
-//	//創建玩家帳號資料
-//	gamer.GetAccountData().SetDirty()
-//
-//	gamer.GetBaseData().Initialize()
-//
-//	err := gamer.GetDeviceData().LoadDataFromDB()
-//	if err != nil {
-//		log.Error(ctx, "NewGamerInitData GetDeviceData load error:%v serverId:%d", err, p.serverId)
-//	}
-//
-//	log.Info(ctx, "NewGamerInitData accountData:%v", accountData)
-//	return gamer
-//}
+	// 這三個參數以login-server賦值為準
+	//gamer.GetAccountData().SetUUID(loginInfo.Uuid)
+	//gamer.GetAccountData().SetLoginWay(loginInfo.LoginWay)
+	//gamer.GetAccountData().SetOpenId(loginInfo.OpenId)
+	//gamer.GetAccountData().SetRegisterTime()
+	//gamer.GetAccountData().CheckFirstTimeLoginGameServer(ctx, p.serverId)
+	//創建玩家帳號資料
+	//gamer.GetAccountData().SetDirty()
+
+	//gamer.GetBaseData().Initialize()
+
+	//err := gamer.GetDeviceData().LoadDataFromDB()
+	//if err != nil {
+	//	log.Error(ctx, "NewGamerInitData GetDeviceData load error:%v serverId:%d", err, p.serverId)
+	//}
+	gamer.SetMsgQue(msgque)
+	fmt.Println("gamer msgque set user:", gamer.GetGamerId())
+	p.AttachGamerContainer(ctx, gamer, false, true, true)
+
+	log.Println(ctx, "NewGamerInitData gamer:", gamer.GetGamerId())
+	return gamer
+}
 
 func (p *GamerContainer) onGamerLoadFromDB(ctx context.Context, gamer igamer.IGamer) {
 	for i := range p.ModelList {

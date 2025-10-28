@@ -1,6 +1,7 @@
 package player
 
 import (
+	"fmt"
 	"proto_buffer_example/server/internal/player/data"
 	"proto_buffer_example/server/third-party/antnet"
 	"time"
@@ -22,22 +23,28 @@ type Gamer struct {
 	index int32
 }
 
-func (g Gamer) GetMsgque() antnet.IMsgQue {
-	//TODO implement me
-	panic("implement me")
+func (p *Gamer) GetMsgque() antnet.IMsgQue {
+	return p.MsgQue
 }
 
-func (g Gamer) EnterGameWorld() {
-	//TODO implement me
-	panic("implement me")
+func (p *Gamer) EnterGameWorld() {
+	fmt.Println("EnterGameWorld gamer:", p.GamerId)
+	return
+	//ctx := context.Background()
+	//log.Info(ctx, "EnterGameWorld gamer:%d", p.GamerId)
+	////修改玩家登入狀態
+	//p.GetBaseData().SetOnline(true)
+	////啟動dirty資料檢查
+	//p.checkDirtyCallback()
+	////啟動玩家心跳
+	//p.startHeartbeat()
 }
 
-func (g Gamer) GetGamerData() *data.GamerData {
-	//TODO implement me
-	panic("implement me")
+func (p *Gamer) GetGamerData() *data.GamerData {
+	return p.GamerData
 }
 
-func (g Gamer) SetMsgQue(msgque antnet.IMsgQue) {
-	//TODO implement me
-	panic("implement me")
+func (p *Gamer) SetMsgQue(msgque antnet.IMsgQue) {
+	p.MsgQue = msgque
+	p.MsgQue.SetUser(p.GamerId)
 }

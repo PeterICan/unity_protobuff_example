@@ -2,7 +2,7 @@ package customize
 
 import (
 	"fmt"
-	"proto_buffer_example/server/internal/persistence"
+	"proto_buffer_example/server/internal/mediator"
 	"proto_buffer_example/server/third-party/antnet"
 )
 
@@ -15,6 +15,7 @@ type MsgStopFunc func(uint64) bool
 type MsgHandler struct {
 	antnet.DefMsgHandler
 	stopFunc MsgStopFunc
+	//GamerContainer *container.GamerContainer
 }
 
 func (p *MsgHandler) SetStopFunc(callbackFunc MsgStopFunc) {
@@ -25,8 +26,8 @@ func (p *MsgHandler) SetStopFunc(callbackFunc MsgStopFunc) {
 
 func (p *MsgHandler) OnNewMsgQue(msgque antnet.IMsgQue) bool {
 	//log.Info(ctx, "----- OnNewMsgQue GetUser:%d", msgque.GetUser())
-	nextGamerId := persistence.GetNextGamerId()
-	fmt.Println("OnNewMsgQue create new gamer with id:", nextGamerId)
+	mediator.IGamerContainerModelMdr.NewGamerInitData(msgque)
+
 	return true
 }
 
@@ -41,7 +42,8 @@ func (p *MsgHandler) OnDelMsgQue(msgque antnet.IMsgQue) {
 		//log.Error(ctx, "----- OnDelMsgQue msgqueId:%d gamerId is zero", msgque.Id())
 		return
 	}
-
+	fmt.Println(gamerId, " 玩家斷線 OnDelMsgQue called")
+	mediator.IGamerContainerModelMdr.RemoveContainerGamer(gamerId)
 	//event.MustFire(gookitevent.GamerBaseExit, gookitevent.GenGameEvent(gookitevent.SetGamerId(gamerId)))
 }
 

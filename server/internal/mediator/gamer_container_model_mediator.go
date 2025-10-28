@@ -28,8 +28,9 @@ type IGamerContainerModelMediator interface {
 	//LoadGamerBaseData(accountData idata.IAccount) (bool, igamer.IGamer)
 	// CallGamerFunc 玩家回呼的函式
 	CallGamerFunc(f func(gamer igamer.IGamer))
-	// NewGamerInitData 新玩家登入時創建基礎資料與取得玩家物件
-	//NewGamerInitData(accountData idata.IAccount, loginInfo *proto.Login_ClientLoginInfo) igamer.IGamer
+	//NewGamerInitData 新玩家登入時創建基礎資料與取得玩家物件
+	//accountData idata.IAccount, loginInfo *proto.Login_ClientLoginInfo
+	NewGamerInitData(msgque antnet.IMsgQue) igamer.IGamer
 	// GetGamerCount 取得玩家數量
 	GetGamerCount() int
 	//SaveGamer 儲存玩家資料
