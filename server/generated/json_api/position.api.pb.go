@@ -153,6 +153,127 @@ func (x *S2CPositionUpdate) GetError() *ErrorResponse {
 	return nil
 }
 
+type WorldPosition struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      string                 `protobuf:"bytes,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 玩家唯一識別碼
+	X             float32                `protobuf:"fixed32,2,opt,name=x,proto3" json:"x,omitempty"`
+	Y             float32                `protobuf:"fixed32,3,opt,name=y,proto3" json:"y,omitempty"`
+	Z             float32                `protobuf:"fixed32,4,opt,name=z,proto3" json:"z,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WorldPosition) Reset() {
+	*x = WorldPosition{}
+	mi := &file_json_api_position_api_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WorldPosition) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorldPosition) ProtoMessage() {}
+
+func (x *WorldPosition) ProtoReflect() protoreflect.Message {
+	mi := &file_json_api_position_api_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorldPosition.ProtoReflect.Descriptor instead.
+func (*WorldPosition) Descriptor() ([]byte, []int) {
+	return file_json_api_position_api_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *WorldPosition) GetPlayerId() string {
+	if x != nil {
+		return x.PlayerId
+	}
+	return ""
+}
+
+func (x *WorldPosition) GetX() float32 {
+	if x != nil {
+		return x.X
+	}
+	return 0
+}
+
+func (x *WorldPosition) GetY() float32 {
+	if x != nil {
+		return x.Y
+	}
+	return 0
+}
+
+func (x *WorldPosition) GetZ() float32 {
+	if x != nil {
+		return x.Z
+	}
+	return 0
+}
+
+// 更新其他玩家位置(包含自己)的通知
+type S2CNotifyWorldPositionChange struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Route         string                 `protobuf:"bytes,1,opt,name=route,proto3" json:"route,omitempty"`         // 路由，值應為 "position/notify_world_position_change"
+	Positions     []*WorldPosition       `protobuf:"bytes,2,rep,name=positions,proto3" json:"positions,omitempty"` // 多個玩家位置資訊
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *S2CNotifyWorldPositionChange) Reset() {
+	*x = S2CNotifyWorldPositionChange{}
+	mi := &file_json_api_position_api_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *S2CNotifyWorldPositionChange) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*S2CNotifyWorldPositionChange) ProtoMessage() {}
+
+func (x *S2CNotifyWorldPositionChange) ProtoReflect() protoreflect.Message {
+	mi := &file_json_api_position_api_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use S2CNotifyWorldPositionChange.ProtoReflect.Descriptor instead.
+func (*S2CNotifyWorldPositionChange) Descriptor() ([]byte, []int) {
+	return file_json_api_position_api_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *S2CNotifyWorldPositionChange) GetRoute() string {
+	if x != nil {
+		return x.Route
+	}
+	return ""
+}
+
+func (x *S2CNotifyWorldPositionChange) GetPositions() []*WorldPosition {
+	if x != nil {
+		return x.Positions
+	}
+	return nil
+}
+
 var File_json_api_position_api_proto protoreflect.FileDescriptor
 
 const file_json_api_position_api_proto_rawDesc = "" +
@@ -166,7 +287,15 @@ const file_json_api_position_api_proto_rawDesc = "" +
 	"\x11S2CPositionUpdate\x12\x14\n" +
 	"\x05route\x18\x01 \x01(\tR\x05route\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12-\n" +
-	"\x05error\x18\x04 \x01(\v2\x17.json_api.ErrorResponseR\x05errorB\rZ\v/.;json_apib\x06proto3"
+	"\x05error\x18\x04 \x01(\v2\x17.json_api.ErrorResponseR\x05error\"V\n" +
+	"\rWorldPosition\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\tR\bplayerId\x12\f\n" +
+	"\x01x\x18\x02 \x01(\x02R\x01x\x12\f\n" +
+	"\x01y\x18\x03 \x01(\x02R\x01y\x12\f\n" +
+	"\x01z\x18\x04 \x01(\x02R\x01z\"k\n" +
+	"\x1cS2CNotifyWorldPositionChange\x12\x14\n" +
+	"\x05route\x18\x01 \x01(\tR\x05route\x125\n" +
+	"\tpositions\x18\x02 \x03(\v2\x17.json_api.WorldPositionR\tpositionsB\rZ\v/.;json_apib\x06proto3"
 
 var (
 	file_json_api_position_api_proto_rawDescOnce sync.Once
@@ -180,19 +309,22 @@ func file_json_api_position_api_proto_rawDescGZIP() []byte {
 	return file_json_api_position_api_proto_rawDescData
 }
 
-var file_json_api_position_api_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_json_api_position_api_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_json_api_position_api_proto_goTypes = []any{
-	(*C2SPositionUpdate)(nil), // 0: json_api.C2SPositionUpdate
-	(*S2CPositionUpdate)(nil), // 1: json_api.S2CPositionUpdate
-	(*ErrorResponse)(nil),     // 2: json_api.ErrorResponse
+	(*C2SPositionUpdate)(nil),            // 0: json_api.C2SPositionUpdate
+	(*S2CPositionUpdate)(nil),            // 1: json_api.S2CPositionUpdate
+	(*WorldPosition)(nil),                // 2: json_api.WorldPosition
+	(*S2CNotifyWorldPositionChange)(nil), // 3: json_api.S2CNotifyWorldPositionChange
+	(*ErrorResponse)(nil),                // 4: json_api.ErrorResponse
 }
 var file_json_api_position_api_proto_depIdxs = []int32{
-	2, // 0: json_api.S2CPositionUpdate.error:type_name -> json_api.ErrorResponse
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	4, // 0: json_api.S2CPositionUpdate.error:type_name -> json_api.ErrorResponse
+	2, // 1: json_api.S2CNotifyWorldPositionChange.positions:type_name -> json_api.WorldPosition
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_json_api_position_api_proto_init() }
@@ -207,7 +339,7 @@ func file_json_api_position_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_json_api_position_api_proto_rawDesc), len(file_json_api_position_api_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

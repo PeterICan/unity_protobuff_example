@@ -54,3 +54,16 @@ message S2CPositionUpdate {
   string status = 3;     // 例如 "success" 或 "failed"
   ErrorResponse error = 4; // 若成功則為 null
 }
+
+message WorldPosition {
+  string player_id = 1; // 玩家唯一識別碼
+  float x = 2;
+  float y = 3;
+  float z = 4;
+}
+
+// 更新其他玩家位置(包含自己)的通知
+message S2CNotifyWorldPositionChange{
+  string route = 1; // 路由，值應為 "position/notify_world_position_change"
+  repeated WorldPosition positions = 2; // 多個玩家位置資訊
+}
