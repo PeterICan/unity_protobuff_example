@@ -2,7 +2,6 @@ package container
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"proto_buffer_example/server/internal/mediator"
 	"proto_buffer_example/server/internal/persistence"
@@ -117,7 +116,7 @@ func (p *GamerContainer) RemoveContainerGamer(gamerId uint64) {
 	} else {
 		p.GamerQuitProcess(ctx, gamer)
 	}
-	fmt.Println("移除玩家連線 RemoveContainerGamer gamer:", gamerId)
+	log.Default().Println("移除玩家連線 編號:", gamerId)
 	//log.Info(ctx, "RemoveContainerGamer gamer:%d", gamerId)
 
 	p.mapLock.Lock()
@@ -264,10 +263,9 @@ func (p *GamerContainer) NewGamerInitData(msgque antnet.IMsgQue) igamer.IGamer {
 	//	log.Error(ctx, "NewGamerInitData GetDeviceData load error:%v serverId:%d", err, p.serverId)
 	//}
 	gamer.SetMsgQue(msgque)
-	fmt.Println("gamer msgque set user:", gamer.GetGamerId())
 	p.AttachGamerContainer(ctx, gamer, false, true, true)
 
-	log.Println(ctx, "NewGamerInitData gamer:", gamer.GetGamerId())
+	log.Println("新建玩家:", gamer.GetGamerId())
 	return gamer
 }
 

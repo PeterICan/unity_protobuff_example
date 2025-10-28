@@ -1,7 +1,6 @@
 package player
 
 import (
-	"fmt"
 	"proto_buffer_example/server/internal/player/data"
 	"proto_buffer_example/server/third-party/antnet"
 	"time"
@@ -28,7 +27,6 @@ func (p *Gamer) GetMsgque() antnet.IMsgQue {
 }
 
 func (p *Gamer) EnterGameWorld() {
-	fmt.Println("EnterGameWorld gamer:", p.GamerId)
 	return
 	//ctx := context.Background()
 	//log.Info(ctx, "EnterGameWorld gamer:%d", p.GamerId)

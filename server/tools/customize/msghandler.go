@@ -1,7 +1,7 @@
 package customize
 
 import (
-	"fmt"
+	"log"
 	"proto_buffer_example/server/internal/mediator"
 	"proto_buffer_example/server/third-party/antnet"
 )
@@ -42,7 +42,7 @@ func (p *MsgHandler) OnDelMsgQue(msgque antnet.IMsgQue) {
 		//log.Error(ctx, "----- OnDelMsgQue msgqueId:%d gamerId is zero", msgque.Id())
 		return
 	}
-	fmt.Println(gamerId, " 玩家斷線 OnDelMsgQue called")
+	log.Default().Println("玩家編號：", gamerId, "斷線 OnDelMsgQue called")
 	mediator.IGamerContainerModelMdr.RemoveContainerGamer(gamerId)
 	//event.MustFire(gookitevent.GamerBaseExit, gookitevent.GenGameEvent(gookitevent.SetGamerId(gamerId)))
 }

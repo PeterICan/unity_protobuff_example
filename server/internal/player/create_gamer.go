@@ -24,6 +24,5 @@ func CreateGamer(gamerId int32, serverId int32) *Gamer {
 		},
 		//MessageCatch: data.NewMessageCatchData(gamerId),
 	}
-	fmt.Println("CreateGamer created gamer:", gamer.GamerData.GameBase.GamerId)
 	return gamer
 }
