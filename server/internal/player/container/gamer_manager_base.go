@@ -1,8 +1,6 @@
 package container
 
 import (
-	"proto_buffer_example/server/generated/json_api"
-	"proto_buffer_example/server/internal/proto/handlers"
 	"proto_buffer_example/server/internal/subsystem/base"
 	"proto_buffer_example/server/third-party/antnet"
 	"proto_buffer_example/server/tools/customize"
@@ -59,11 +57,10 @@ func (p *SubsystemContainer) InitWebSocketServerBase(serverId int32, addr string
 	//ctx = log.WriteServerIdWithCtx(ctx, p.ServerId)
 	//p.initAttachedSubsystem(p.ServerId, serviceInfo)
 	msgHandler := &customize.MsgHandler{}
-	positionHandler := &handlers.PositionHandler{}
-	gamerInfoHandler := &handlers.GamerInfoHandler{}
+
 	// Register handlers for the C2S message types
-	msgHandler.RegisterMsg(&json_api.C2SPositionUpdate{}, positionHandler.HandleC2SPositionUpdate)
-	msgHandler.RegisterMsg(&json_api.C2SGamerInfoRetrieve{}, gamerInfoHandler.HandleC2SGamerInfoRetrieve)
+
+	//msgHandler.RegisterMsg(&json_api.C2SGamerInfoRetrieve{}, gamerInfoHandler.HandleC2SGamerInfoRetrieve)
 
 	msgParser := &antnet.Parser{}
 	msgParser.Type = antnet.ParserTypeCustom
@@ -73,12 +70,11 @@ func (p *SubsystemContainer) InitWebSocketServerBase(serverId int32, addr string
 	// EX: Route = "position/update" -> 解析成 json_api.C2SPositionUpdate
 	jsonRouteParser := customize.NewJsonRouteParser(msgParser)
 	msgParser.SetIParser(jsonRouteParser)
-
-	//p.initRegisterMsgHandler(msgHandler)
 	// 註冊子系統的封包解析，多傳入一個jsonRouteParser
 	// 註冊時一樣使用 jsonRouteParser.RegisterMsg 來註冊封包
 	// EX: jsonRouteParser.RegisterMsg("position/update", &json_api.C2SPositionUpdate{}, nil)
 	p.initRegisterMsgParser(msgParser, jsonRouteParser)
+	p.initRegisterMsgHandler(msgHandler)
 	//addr := fmt.Sprintf("ws://:%s/ws", serviceInfo.Port)
 	err := antnet.StartServer(addr, antnet.MsgTypeCmd, msgHandler, msgParser)
 	if err != nil {
@@ -98,7 +94,7 @@ func (p *SubsystemContainer) initRegisterMsgHandler(handler *customize.MsgHandle
 
 func (p *SubsystemContainer) initRegisterMsgParser(parser *antnet.Parser, customParser *customize.JsonRouteParser) {
 	for i := range p.ControllerList {
-		p.ControllerList[i].RegisterMsgParser(parser, nil)
+		p.ControllerList[i].RegisterMsgParser(parser, customParser)
 	}
 }
 
