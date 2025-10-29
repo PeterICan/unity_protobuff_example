@@ -4,6 +4,10 @@ using ProtoBufferExample.Client.Game.Presenters;
 
 namespace ProtoBufferExample.Client.Game.Singleton
 {
+    /// <summary>
+    /// 單例類別，用於管理系統範圍的元件，例如 ConnectionModel 和 ConnectionPresenter。
+    /// 管理所有 model 和 presenter 的生命週期。
+    /// </summary>
     public class SystemManager : MonoBehaviour
     {
         public static SystemManager Instance { get; private set; }
@@ -66,13 +70,13 @@ namespace ProtoBufferExample.Client.Game.Singleton
                 return;
             }
 
-            ConnectionModel = new ProtoBufferExample.Client.Game.Models.ConnectionModel(connection, serializer);
+            ConnectionModel = new ConnectionModel(connection, serializer);
             // _connectionPresenter is not instantiated here because it needs a concrete IConnectionView instance.
             // It will be instantiated and stored when a View calls GetConnectionPresenter.
         }
 
         // This method will be called by the View to register itself and get the presenter
-        public ProtoBufferExample.Client.Game.Presenters.ConnectionPresenter GetConnectionPresenter(ProtoBufferExample.Client.Game.Views.IConnectionView view)
+        public ConnectionPresenter GetConnectionPresenter(Views.IConnectionView view)
         {
             if (ConnectionModel == null)
             {
@@ -80,9 +84,9 @@ namespace ProtoBufferExample.Client.Game.Singleton
                 return null;
             }
             // Instantiate Presenter here, as it needs the concrete view instance
-            _connectionPresenter = new ProtoBufferExample.Client.Game.Presenters.ConnectionPresenter(ConnectionModel, view); // Store the created presenter
+            _connectionPresenter = new ConnectionPresenter(ConnectionModel, view); // Store the created presenter
             return _connectionPresenter;
-        }
+        }        
 
         public string ServerAddress => _serverAddress;
         public int ServerPort => _serverPort;

@@ -10,88 +10,104 @@ namespace ProtoBufferExample.Client.Game.Views
 {
     public class ConnectionView : MonoBehaviour, IConnectionView
     {
-        [Header("UI References")]
+        [Header("Connection Tab UI References")]
         [SerializeField] private TMP_Text _connectionStatusText;
         [SerializeField] private Button _connectButton;
         [SerializeField] private ScrollRect _logScrollRect;
         [SerializeField] private TMP_Text _otherPlayersStatusText; // Reverted to placeholder
+
+        [SerializeField] private TMP_Text _connectButtonText;
+
 
         [Header("Log Panel Settings")]
         [SerializeField] private RectTransform _logContentParent; // The Content RectTransform of the ScrollRect
         [SerializeField] private GameObject _logMessagePrefab; // A TMP_Text prefab for individual log entries
         [SerializeField] private int _maxLogMessages = 100; // Max number of log messages to display
 
+        [Header("Test Function Tab UI")]
+        [SerializeField] private Button _C2S_PositionUpdateButton;
+        [SerializeField] private Button _C2S_ChatMessageButton;
+        [SerializeField] private Button _C2S_AttackButton;
+        [SerializeField] private TMP_Text _testResultText;
+
         private List<GameObject> _currentLogMessages = new List<GameObject>();
 
         private ConnectionPresenter _presenter;
         private ConnectionModel _model;
 
-        private bool _isConnected;
-
         private void Start()
         {
-            // Get ConnectionModel and ConnectionPresenter from SystemManager
             if (SystemManager.Instance == null)
             {
-                Debug.LogError("SystemManager.Instance is null. Make sure SystemManager GameObject is in the scene and initialized.");
+                Debug.LogError("SystemManager.Instance is null.");
                 return;
             }
 
-            _model = SystemManager.Instance.ConnectionModel;
-            _presenter = SystemManager.Instance.GetConnectionPresenter(this); // Pass 'this' (IConnectionView) to get the presenter
+            _presenter = SystemManager.Instance.GetConnectionPresenter(this);
 
-            if (_model == null || _presenter == null)
+            if (_presenter == null)
             {
-                Debug.LogError("ConnectionModel or ConnectionPresenter could not be retrieved from SystemManager.");
+                Debug.LogError("ConnectionPresenter could not be retrieved.");
                 return;
             }
 
-            // Wire up UI events
-            _connectButton?.onClick.AddListener(
-                () =>
-                {
-                    if (_isConnected == false)
-                    {
-                        _connectionStatusText.text = $"連線狀態: 連線中...";
-                        _connectButton.interactable = false;
-                        _presenter.Connect(SystemManager.Instance.ServerAddress, SystemManager.Instance.ServerPort);
-                    }
-                    else
-                    {
-                        _presenter.Disconnect();
-                    }
-                }
-                );
+            SetupConnectionTabEvents();
+            SetupTestFunctionTabEvents();
+        }
+
+         private void SetupConnectionTabEvents()
+        {
+            _connectButton?.onClick.AddListener(() => _presenter.OnConnectButtonClicked());
+        }
+
+        private void SetupTestFunctionTabEvents()
+        {
+            _C2S_PositionUpdateButton?.onClick.AddListener(OnPositionUpdateClicked);
+            _C2S_ChatMessageButton?.onClick.AddListener(() => _presenter.SendTestMessage("ChatMessage"));
+            _C2S_AttackButton?.onClick.AddListener(() => _presenter.SendTestMessage("Attack"));
         }
 
         private void OnDestroy()
         {
             // Clean up UI event listeners
             _connectButton?.onClick.RemoveAllListeners();
-        }
+            _C2S_PositionUpdateButton?.onClick.RemoveAllListeners();
+            _C2S_ChatMessageButton?.onClick.RemoveAllListeners();
+            _C2S_AttackButton?.onClick.RemoveAllListeners();
 
-        // IConnectionView implementation
-        public void UpdateConnectionStatus(bool isConnected)
-        {
-            if (_connectionStatusText != null)
+            if (_presenter != null)
             {
-                _connectButton.interactable = true;
-                if (isConnected)
-                {
-                    _isConnected = true;
-                    _connectButton.GetComponentInChildren<TMP_Text>().text = "斷線";
-                    _connectionStatusText.text = $"連線狀態: 已連線";
-                    return;
-                }
-                if (!isConnected)
-                {
-                    _isConnected = false;
-                    _connectButton.GetComponentInChildren<TMP_Text>().text = "連線";
-                    _connectionStatusText.text = $"連線狀態: 未連線";
-                    return;
-                }
+                // _presenter.Dispose();
             }
         }
+
+        #region IConnectionView Implementation - Connection Tab
+        public void SetConnectionStatusText(string text)
+        {
+            if (_connectionStatusText != null)
+                _connectionStatusText.text = text;
+        }
+
+        public void SetConnectButtonText(string text)
+        {
+            if (_connectButtonText != null)
+                _connectButtonText.text = text;
+        }
+
+        public void SetConnectButtonEnabled(bool enabled)
+        {
+            if (_connectButton != null)
+                _connectButton.interactable = enabled;
+        }
+
+
+
+        public void UpdateOtherPlayersStatus(string status)
+        {
+            if (_otherPlayersStatusText != null)
+                _otherPlayersStatusText.text = status;
+        }
+
 
         public void LogMessage(string message)
         {
@@ -126,16 +142,41 @@ namespace ProtoBufferExample.Client.Game.Views
                 _logScrollRect.verticalNormalizedPosition = 0f;
             }
         }
-
-        // Reverted: UpdateOtherPlayersStatus method
-        // For now, _otherPlayersStatusText will be updated directly by the presenter if needed.
-        // The presenter will need to format the status string.
-        public void UpdateOtherPlayersStatus(string status)
+        #endregion
+        #region IConnectionView Implementation - Test Function Tab
+        public void SetTestButtonsInteractable(bool interactable)
         {
-            if (_otherPlayersStatusText != null)
-            {
-                _otherPlayersStatusText.text = status;
-            }
+            if (_C2S_PositionUpdateButton != null)
+                _C2S_PositionUpdateButton.interactable = interactable;
+
+            if (_C2S_ChatMessageButton != null)
+                _C2S_ChatMessageButton.interactable = interactable;
+
+            if (_C2S_AttackButton != null)
+                _C2S_AttackButton.interactable = interactable;
         }
+
+        public void ShowTestResult(string result)
+        {
+            if (_testResultText != null)
+            {
+                _testResultText.text = result;
+            }
+
+            // 也可以记录到日志
+            LogMessage(result);
+        }
+
+        private void OnPositionUpdateClicked()
+        {
+            // 示例：发送随机位置
+            float x = Random.Range(0f, 100f);
+            float y = Random.Range(0f, 100f);
+            float z = Random.Range(0f, 100f);
+
+            _presenter.SendPositionUpdate(x, y, z);
+        }
+
+        #endregion
     }
 }

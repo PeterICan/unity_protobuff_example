@@ -2,8 +2,15 @@ namespace ProtoBufferExample.Client.Game.Views
 {
     public interface IConnectionView
     {
-        void UpdateConnectionStatus(bool isConnected);
+        // Connection Tab
+        void SetConnectionStatusText(string text);
+        void SetConnectButtonText(string text);
+        void SetConnectButtonEnabled(bool enabled);
+        void UpdateOtherPlayersStatus(string status);
         void LogMessage(string message);
-        // Reverted: void UpdateOtherPlayersStatus(string status);
+
+        // Test Function Tab
+        void SetTestButtonsInteractable(bool interactable);
+        void ShowTestResult(string result);
     }
 }
