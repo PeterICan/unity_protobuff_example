@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System;
 
+namespace ProtoBufferExample.Client.Game.TestScript
+{
 // Define the message header structure, ensuring it matches the memory layout of the Go struct.
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct MessageHead
@@ -168,4 +170,5 @@ public class AntnetEchoTest : MonoBehaviour
             Debug.LogError($"An error occurred: {e.Message}");
         }
     }
+}
 }

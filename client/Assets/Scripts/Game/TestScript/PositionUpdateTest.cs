@@ -3,8 +3,9 @@ using System.IO;
 using ProtoBufferExample.Client.Generated;
 using Newtonsoft.Json.Linq;
 using JsonApi;
+using ProtoBufferExample.Client;
 
-namespace ProtoBufferExample.Client
+namespace ProtoBufferExample.Client.Game.TestScript
 {
     public class PositionUpdateTest : MonoBehaviour
     {

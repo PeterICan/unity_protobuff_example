@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-namespace ProtoBufferExample.Client.Views
+namespace ProtoBufferExample.Client.Game.Views
 {
     public class TabManagerView : MonoBehaviour
     {

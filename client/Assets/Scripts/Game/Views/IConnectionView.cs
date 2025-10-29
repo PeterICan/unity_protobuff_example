@@ -1,4 +1,4 @@
-namespace ProtoBufferExample.Client.Views
+namespace ProtoBufferExample.Client.Game.Views
 {
     public interface IConnectionView
     {

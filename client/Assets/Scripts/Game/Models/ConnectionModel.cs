@@ -1,7 +1,8 @@
 using System;
 using UnityEngine; // For Debug.Log, etc.
+using ProtoBufferExample.Client;
 
-namespace ProtoBufferExample.Client.Models
+namespace ProtoBufferExample.Client.Game.Models
 {
     public class ConnectionModel
     {

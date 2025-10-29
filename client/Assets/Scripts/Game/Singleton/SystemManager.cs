@@ -1,6 +1,8 @@
 using UnityEngine;
+using ProtoBufferExample.Client.Game.Models;
+using ProtoBufferExample.Client.Game.Presenters;
 
-namespace ProtoBufferExample.Client
+namespace ProtoBufferExample.Client.Game.Singleton
 {
     public class SystemManager : MonoBehaviour
     {
@@ -17,8 +19,8 @@ namespace ProtoBufferExample.Client
         public enum SerializerType { Protobuf, JSON }
 
         // Public properties to access Model
-        public Models.ConnectionModel ConnectionModel { get; private set; }
-        private Presenters.ConnectionPresenter _connectionPresenter; // Reserved place for the presenter
+        public ConnectionModel ConnectionModel { get; private set; }
+        private ConnectionPresenter _connectionPresenter; // Reserved place for the presenter
 
         private void Awake()
         {
@@ -64,13 +66,13 @@ namespace ProtoBufferExample.Client
                 return;
             }
 
-            ConnectionModel = new Models.ConnectionModel(connection, serializer);
+            ConnectionModel = new ProtoBufferExample.Client.Game.Models.ConnectionModel(connection, serializer);
             // _connectionPresenter is not instantiated here because it needs a concrete IConnectionView instance.
             // It will be instantiated and stored when a View calls GetConnectionPresenter.
         }
 
         // This method will be called by the View to register itself and get the presenter
-        public Presenters.ConnectionPresenter GetConnectionPresenter(Views.IConnectionView view)
+        public ProtoBufferExample.Client.Game.Presenters.ConnectionPresenter GetConnectionPresenter(ProtoBufferExample.Client.Game.Views.IConnectionView view)
         {
             if (ConnectionModel == null)
             {
@@ -78,7 +80,7 @@ namespace ProtoBufferExample.Client
                 return null;
             }
             // Instantiate Presenter here, as it needs the concrete view instance
-            _connectionPresenter = new Presenters.ConnectionPresenter(ConnectionModel, view); // Store the created presenter
+            _connectionPresenter = new ProtoBufferExample.Client.Game.Presenters.ConnectionPresenter(ConnectionModel, view); // Store the created presenter
             return _connectionPresenter;
         }
 

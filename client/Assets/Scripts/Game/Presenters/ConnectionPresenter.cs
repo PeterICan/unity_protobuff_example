@@ -1,8 +1,8 @@
-using ProtoBufferExample.Client.Models;
-using ProtoBufferExample.Client.Views;
+using ProtoBufferExample.Client.Game.Models;
+using ProtoBufferExample.Client.Game.Views;
 using UnityEngine; // For MonoBehaviour
 
-namespace ProtoBufferExample.Client.Presenters
+namespace ProtoBufferExample.Client.Game.Presenters
 {
     public class ConnectionPresenter
     {

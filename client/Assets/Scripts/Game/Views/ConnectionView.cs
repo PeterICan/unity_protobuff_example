@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using ProtoBufferExample.Client.Presenters;
-using ProtoBufferExample.Client.Models;
+using ProtoBufferExample.Client.Game.Presenters;
+using ProtoBufferExample.Client.Game.Models;
+using ProtoBufferExample.Client.Game.Singleton; // For SystemManager
 using System.Collections.Generic; // For List
 
-namespace ProtoBufferExample.Client.Views
+namespace ProtoBufferExample.Client.Game.Views
 {
     public class ConnectionView : MonoBehaviour, IConnectionView
     {
