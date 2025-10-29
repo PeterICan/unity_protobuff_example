@@ -275,3 +275,10 @@ func NewTagMsg(cmd, act uint8, index uint16) *Message {
 		},
 	}
 }
+
+// NewByteHeadlessMsg 新增一個沒有Head的Message，用於WebSocket等協議
+func NewByteHeadlessMsg() *Message {
+	return &Message{
+		Head: nil,
+	}
+}

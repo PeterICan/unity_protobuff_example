@@ -1,8 +1,10 @@
 package persistence
 
 import (
+	"fmt"
 	"log"
 	"proto_buffer_example/server/tools/common"
+	"reflect"
 )
 
 /*
@@ -23,6 +25,27 @@ func GetNextGamerId() int32 {
 	storageData[NextGamerIdKey] = nextGamerId + 1
 	writeStorageJson(storageData)
 	return nextGamerId
+}
+
+func SavePlayerData(gamerId uint64, data interface{}) {
+	if data == nil {
+		log.Fatal("SavePlayerData data is nil.")
+		return
+	}
+	var playerData map[string]interface{}
+	storageData := getStorageJson()
+	if val, ok := storageData[fmt.Sprintf("Gamer_%d", gamerId)]; ok {
+		playerData = val.(map[string]interface{})
+	} else {
+		playerData = make(map[string]interface{})
+	}
+
+	dataKey := reflect.TypeOf(data).String()
+	fmt.Println("SavePlayerData dataKey:", dataKey)
+	playerData[dataKey] = data
+	storageData[fmt.Sprintf("Gamer_%d", gamerId)] = playerData
+	writeStorageJson(storageData)
+	log.Default().Println("SavePlayerData called.")
 }
 
 const StorageJsonFile = "data/storage"

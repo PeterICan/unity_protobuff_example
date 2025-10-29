@@ -2,6 +2,7 @@ package player
 
 import (
 	"proto_buffer_example/server/internal/player/data"
+	"proto_buffer_example/server/internal/player/interface/idata"
 	"proto_buffer_example/server/third-party/antnet"
 	"time"
 )
@@ -42,7 +43,11 @@ func (p *Gamer) GetGamerData() *data.GamerData {
 	return p.GamerData
 }
 
+func (p *Gamer) GetPositionData() idata.IPosition {
+	return p.Position
+}
+
 func (p *Gamer) SetMsgQue(msgque antnet.IMsgQue) {
 	p.MsgQue = msgque
-	p.MsgQue.SetUser(p.GamerId)
+	p.MsgQue.SetUser(p.GameBase.GamerId)
 }

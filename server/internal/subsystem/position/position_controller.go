@@ -1,8 +1,12 @@
 package position
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"proto_buffer_example/server/generated/json_api"
+	"proto_buffer_example/server/internal/mediator"
 	"proto_buffer_example/server/internal/subsystem/base"
 	"proto_buffer_example/server/third-party/antnet"
 	"proto_buffer_example/server/tools/customize"
@@ -45,38 +49,35 @@ func (p *PositionController) Stop() {
 
 func (p *PositionController) OnC2SPositionUpdate(msgque antnet.IMsgQue, msg *antnet.Message) bool {
 
-	log.Default().Println("OnC2SPositionUpdate called.")
-
-	return true
-	//ctx := context.Background()
+	ctx := context.Background()
 	//ctx = log.MsgTraceIntoCtx(ctx, p.ServerId)
-	//c2s := msg.C2S().(*proto.GamerInfo_C2SRetrieve)
-	//if c2s == nil {
-	//	log.Error(ctx, "OnC2SRetrieve c2s is nil, msgqueId:%v getUser:%v", msgque.Id(), msgque.GetUser())
-	//	return false
-	//}
-	//
-	//gamer, ok := mediator.IGamerContainerModelMdr.GetGamerFromMsgque(msgque)
-	//if !ok {
-	//	log.Error(ctx, "OnC2SRetrieve gamer is nil, msgqueId:%v getUser:%v", msgque.Id(), msgque.GetUser())
-	//	return false
-	//}
-	//
-	//if resend := gamer.TryResendMessage(msg); resend {
-	//	return true
-	//}
-	//
-	//log.Trace(ctx, "OnC2SRetrieve gamer:%d c2s:%v", gamer.GetGamerId(), c2s)
-	//
-	//rsp := antnet.NewMsgFormClientMsg(msg)
-	//s2c := &proto.GamerInfo_S2CRetrieve{}
-	//
-	//mediator.IPositionModelMdr.OnRetrieve(ctx, gamer, s2c)
-	//
-	//rsp.Data = antnet.PbData(s2c)
-	//msgque.Send(rsp)
+	c2s := msg.C2S().(*json_api.C2SPositionUpdate)
+	if c2s == nil {
+		log.Fatal(ctx, "OnC2SRetrieve c2s is nil, msgqueId:%v getUser:%v", msgque.Id(), msgque.GetUser())
+		return false
+	}
+
+	gamer, ok := mediator.IGamerContainerModelMdr.GetGamerFromMsgque(msgque)
+	if !ok {
+		log.Fatal(ctx, "OnC2SRetrieve gamer is nil, msgqueId:%v getUser:%v", msgque.Id(), msgque.GetUser())
+		return false
+	}
+
+	log.Default().Println("OnC2SPositionUpdate called. gamerId:", gamer.GetGamerId(), "c2s:", c2s)
+
+	rsp := antnet.NewByteHeadlessMsg()
+	s2c := &json_api.S2CPositionUpdate{}
+
+	mediator.IPositionModelMdr.OnUpdatePosition(ctx, gamer, c2s, s2c)
+	s2cJsonData, err := json.Marshal(s2c)
+	if err != nil {
+		fmt.Printf("Error marshalling response to JSON: %v\n", err)
+		return false
+	}
+	rsp.Data = s2cJsonData
+	msgque.Send(rsp)
 	//gamer.AddCatchMessage(rsp)
 	//ctx = log.MsgUpdateTraceTime(ctx)
 	//log.Trace(ctx, "OnC2SRetrieve gamer:%d s2c:%v", gamer.GetGamerId(), s2c)
-	//return true
+	return true
 }

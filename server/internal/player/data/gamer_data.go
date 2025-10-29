@@ -17,6 +17,8 @@ type GamerData struct {
 	*GameBase
 	//帳號資料
 	//Account *Account
+	//位置
+	Position *Position
 }
 
 // CreateGamerData 產生並初始化一個玩家資料層物件

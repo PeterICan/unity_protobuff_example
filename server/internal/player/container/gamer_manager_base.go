@@ -34,7 +34,7 @@ func (p *SubsystemContainer) InitServerBase(serverId int32, addr string) { //ser
 	p.ServerId = serverId
 	//ctx := context.Background()
 	//ctx = log.WriteServerIdWithCtx(ctx, p.ServerId)
-	//p.initAttachedSubsystem(p.ServerId, serviceInfo)
+	p.initAttachedSubsystem(p.ServerId)
 	msgHandler := &customize.MsgHandler{}
 	msgParser := &antnet.Parser{Type: antnet.ParserTypePB}
 	p.initRegisterMsgHandler(msgHandler)
@@ -51,11 +51,25 @@ func (p *SubsystemContainer) InitServerBase(serverId int32, addr string) { //ser
 	//p.serverMonitor()
 }
 
+func (p *SubsystemContainer) initAttachedSubsystem(serviceId int32) {
+	for i := range p.ModelList {
+		p.ModelList[i].Init(serviceId)
+	}
+
+	for i := range p.ControllerList {
+		p.ControllerList[i].Init(serviceId)
+	}
+
+	for i := range p.ModelList {
+		p.ModelList[i].LoadFromDB()
+	}
+}
+
 func (p *SubsystemContainer) InitWebSocketServerBase(serverId int32, addr string) { //serverInfo server.ServerInfo, port int) {
 	p.ServerId = serverId
 	//ctx := context.Background()
 	//ctx = log.WriteServerIdWithCtx(ctx, p.ServerId)
-	//p.initAttachedSubsystem(p.ServerId, serviceInfo)
+	p.initAttachedSubsystem(p.ServerId)
 	msgHandler := &customize.MsgHandler{}
 
 	// Register handlers for the C2S message types

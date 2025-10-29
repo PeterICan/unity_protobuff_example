@@ -1,3 +1,5 @@
 package mediator
 
 var IGamerContainerModelMdr IGamerContainerModelMediator
+
+var IPositionModelMdr IPositionModelMediator

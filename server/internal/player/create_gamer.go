@@ -20,6 +20,7 @@ func CreateGamer(gamerId int32, serverId int32) *Gamer {
 				LastLoginTime:  time_helper.TaipeiTime(),
 				LastLogoutTime: time_helper.TaipeiTime(),
 			},
+			Position: &data.Position{GamerId: uint64(gamerId)},
 			//Account: accountData.(*data.Account),
 		},
 		//MessageCatch: data.NewMessageCatchData(gamerId),

@@ -2,6 +2,7 @@ package igamer
 
 import (
 	"proto_buffer_example/server/internal/player/data"
+	"proto_buffer_example/server/internal/player/interface/idata"
 	"proto_buffer_example/server/third-party/antnet"
 )
 
@@ -14,6 +15,8 @@ type IGamer interface {
 	EnterGameWorld()
 	// GetGamerData 取得玩家資料結構結合
 	GetGamerData() *data.GamerData
+	// GetPositionData 取得玩家位置資料介面
+	GetPositionData() idata.IPosition
 	// SetMsgQue 設定玩家連線模組
 	SetMsgQue(msgque antnet.IMsgQue)
 	//// GetBaseData 取得玩家基本資料

@@ -71,6 +71,6 @@ func (p *webSocketServer) initAttachedSubsystem() {
 		&position.PositionController{},
 	}
 	p.ModelList = []base.ISubsystemModel{
-		&position.PositionModel{},
+		position.NewPositionModel(),
 	}
 }
