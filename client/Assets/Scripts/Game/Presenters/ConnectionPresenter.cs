@@ -1,5 +1,6 @@
 using ProtoBufferExample.Client.Game.Models;
 using ProtoBufferExample.Client.Game.Views;
+using Google.Protobuf; // For IMessage
 using JsonApi;
 using UnityEngine; // For MonoBehaviour
 
@@ -25,7 +26,7 @@ namespace ProtoBufferExample.Client.Game.Presenters
         private void UpdateUI()
         {
             bool isConnected = _model.IsConnected;
-            
+
             // Update Connection Tab UI
             if (_isConnecting)
             {
@@ -43,7 +44,7 @@ namespace ProtoBufferExample.Client.Game.Presenters
                 _view.SetConnectionStatusText("連線狀態: 未連線");
                 _view.SetConnectButtonText("連線");
                 _view.SetConnectButtonEnabled(true);
-                
+
             }
 
             // Update Test Function Tab UI
@@ -102,7 +103,8 @@ namespace ProtoBufferExample.Client.Game.Presenters
                 return;
             }
 
-            var message = new C2SPositionUpdate {
+            var message = new C2SPositionUpdate
+            {
                 Route = "position/update",
                 X = x,
                 Y = y,

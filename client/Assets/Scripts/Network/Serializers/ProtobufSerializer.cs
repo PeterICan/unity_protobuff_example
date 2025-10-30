@@ -1,4 +1,5 @@
 using Google.Protobuf;
+using Newtonsoft.Json.Linq;
 
 namespace ProtoBufferExample.Client
 {
@@ -24,6 +25,12 @@ namespace ProtoBufferExample.Client
                 return (T)message;
             }
             throw new System.ArgumentException("Type T must be a Google.Protobuf.IMessage", nameof(T));
+        }
+
+        public JObject DeserializeToJObject(byte[] data)
+        {
+            var json = System.Text.Encoding.UTF8.GetString(data);
+            return JObject.Parse(json);
         }
     }
 }

@@ -1,6 +1,8 @@
 using System;
 using UnityEngine; // For Debug.Log, etc.
-using ProtoBufferExample.Client;
+using Newtonsoft.Json.Linq;
+using JsonApi;
+using Google.Protobuf;
 
 namespace ProtoBufferExample.Client.Game.Models
 {
@@ -11,7 +13,7 @@ namespace ProtoBufferExample.Client.Game.Models
 
         public event Action<bool> OnConnectionStatusChanged;
         public event Action<string> OnMessageLogged;
-        public event Action<byte[]> OnRawMessageReceived;
+        public event Action<IMessage> OnRawMessageReceived;
 
         public bool IsConnected => _connection?.IsConnected ?? false;
 
@@ -86,8 +88,71 @@ namespace ProtoBufferExample.Client.Game.Models
 
         private void HandleRawMessageReceived(byte[] rawData)
         {
-            OnRawMessageReceived?.Invoke(rawData);
-            LogMessage($"Received raw data, length: {rawData.Length}");
+            try
+            {
+                //解析傳來的 rawData 成 JSON
+                JObject jsonObject = _serializer.DeserializeToJObject(rawData);
+                Debug.Log($"Received raw data as JSON: {jsonObject}");
+                string route = jsonObject["route"]?.ToString();
+                
+                if (string.IsNullOrEmpty(route))
+                {
+                    Debug.LogWarning("Received message without route");
+                    return;
+                }
+                
+                IMessage message = null;
+                switch (route)
+                {
+                    case "position/update":
+                        message = _serializer.Deserialize<S2CPositionUpdate>(rawData);
+                        Debug.Log($"Parsed Position Update Response: {message as S2CPositionUpdate}");
+                        break;
+                    case "position/notify":
+                        message = _serializer.Deserialize<S2CNotifyWorldPositionChange>(rawData);
+                        Debug.Log($"Parsed Position Notify: {message as S2CNotifyWorldPositionChange}");
+                        break;
+                    default:
+                        Debug.LogWarning($"Unknown route: {route}");
+                        return;
+                }
+                
+                if (message == null)
+                {
+                    Debug.LogWarning($"Failed to deserialize message for route: {route}");
+                    return;
+                }
+                
+                if (message is not S2CPositionUpdate
+                    && message is not S2CNotifyWorldPositionChange)
+                {
+                    Debug.Log($"Unexpected Log Message From ConnectionPresenter: {message.Descriptor.FullName}");
+                }
+                
+                string logMessage = message switch
+                {
+                    S2CPositionUpdate posUpdate when posUpdate.Status != "" => 
+                        $"[位置更新回應失敗] 狀態: {posUpdate.Status}",
+                    S2CPositionUpdate => 
+                        $"[位置更新回應成功]",
+                    S2CNotifyWorldPositionChange => 
+                        $"[位置變更通知]",
+                    _ => 
+                        $"[未知消息類型] {message.Descriptor.FullName}"
+                };
+                
+                Debug.Log(logMessage);
+                LogMessage(logMessage);
+                
+                // Trigger the raw message received event
+                OnRawMessageReceived?.Invoke(message);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error handling received message: {ex.Message}");
+                LogMessage($"Message handling error: {ex.Message}");
+                // Don't rethrow the exception to prevent connection disruption
+            }
         }
 
         private void HandleConnectionStatusChanged(bool isConnected)
@@ -106,7 +171,7 @@ namespace ProtoBufferExample.Client.Game.Models
 
         public void LogMessage(string message)
         {
-            OnMessageLogged?.Invoke($"[{DateTime.Now:HH:mm:ss}] {message}");
+            OnMessageLogged?.Invoke(message);
         }
     }
 }
