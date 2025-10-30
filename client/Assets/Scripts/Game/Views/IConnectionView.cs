@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ProtoBufferExample.Client.Game.Views
 {
     public interface IConnectionView
@@ -12,5 +14,7 @@ namespace ProtoBufferExample.Client.Game.Views
         // Test Function Tab
         void SetTestButtonsInteractable(bool interactable);
         void ShowTestResult(string result);
+
+        void UpdatePlayerCards(List<JsonApi.WorldPosition> players);
     }
 }

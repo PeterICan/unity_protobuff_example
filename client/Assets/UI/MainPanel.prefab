@@ -120,8 +120,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5507248079846596139}
   m_HandleRect: {fileID: 4088601341311682187}
   m_Direction: 2
-  m_Value: -0.0000004196167
-  m_Size: 0.19998343
+  m_Value: -0.00000019073487
+  m_Size: 0.2
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -246,7 +246,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3082550404339934304}
   m_HandleRect: {fileID: 3184036386944491658}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -666,7 +666,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000015258789, y: -199.99966}
+  m_AnchoredPosition: {x: -0.000015258789, y: -199.99983}
   m_SizeDelta: {x: 0, y: 1000}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &7378817154433962549
@@ -5229,8 +5229,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5282710500588186942}
   m_HandleRect: {fileID: 6912657125501536744}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.9999999
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6504,6 +6504,8 @@ MonoBehaviour:
   _C2S_ChatMessageButton: {fileID: 0}
   _C2S_AttackButton: {fileID: 0}
   _testResultText: {fileID: 0}
+  _playerCardPrefab: {fileID: 3824498853996887958, guid: 1af3325645a57484eb3349547bd40ca4, type: 3}
+  _playerCardsContentParent: {fileID: 5541492405347931653}
 --- !u!1 &7208273685797724194
 GameObject:
   m_ObjectHideFlags: 0

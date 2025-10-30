@@ -108,7 +108,7 @@ namespace ProtoBufferExample.Client.Game.Models
                         message = _serializer.Deserialize<S2CPositionUpdate>(rawData);
                         Debug.Log($"Parsed Position Update Response: {message as S2CPositionUpdate}");
                         break;
-                    case "position/notify":
+                    case "position/notify_world_position_change":
                         message = _serializer.Deserialize<S2CNotifyWorldPositionChange>(rawData);
                         Debug.Log($"Parsed Position Notify: {message as S2CNotifyWorldPositionChange}");
                         break;

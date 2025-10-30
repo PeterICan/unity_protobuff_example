@@ -2,7 +2,9 @@ using ProtoBufferExample.Client.Game.Models;
 using ProtoBufferExample.Client.Game.Views;
 using Google.Protobuf; // For IMessage
 using JsonApi;
-using UnityEngine; // For MonoBehaviour
+using UnityEngine;
+using System;
+using System.Linq; // For MonoBehaviour
 
 namespace ProtoBufferExample.Client.Game.Presenters
 {
@@ -19,8 +21,32 @@ namespace ProtoBufferExample.Client.Game.Presenters
 
             _model.OnConnectionStatusChanged += OnConnectionStatusChanged;
             _model.OnMessageLogged += OnMessageLogged;
+            _model.OnRawMessageReceived += OnRawMessageReceived;
 
             UpdateUI();
+        }
+
+        private void OnRawMessageReceived(IMessage message)
+        {
+            if (message is not S2CPositionUpdate
+                and not S2CNotifyWorldPositionChange
+            )
+            {
+                return;
+            }
+
+            
+            switch (message)
+            {
+                case S2CPositionUpdate posUpdate:
+                    Debug.Log($"Position Update Response Received: Status={posUpdate.Status}");
+                    break;
+                case S2CNotifyWorldPositionChange notify:
+                    Debug.Log($"World Position Change Notification Received: {notify.Positions.Count} players");
+                    _view.UpdatePlayerCards(notify.Positions.ToList());
+                    break;
+            }
+
         }
 
         private void UpdateUI()
@@ -82,7 +108,7 @@ namespace ProtoBufferExample.Client.Game.Presenters
             _isConnecting = true;
             UpdateUI();
 
-            var systemManager = Object.FindObjectOfType<Singleton.SystemManager>();
+            var systemManager = UnityEngine.Object.FindObjectOfType<Singleton.SystemManager>();
             if (systemManager != null)
             {
                 _model.Connect(systemManager.ServerAddress, systemManager.ServerPort);

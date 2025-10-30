@@ -4,7 +4,8 @@ using TMPro;
 using ProtoBufferExample.Client.Game.Presenters;
 using ProtoBufferExample.Client.Game.Models;
 using ProtoBufferExample.Client.Game.Singleton; // For SystemManager
-using System.Collections.Generic; // For List
+using System.Collections.Generic;
+using JsonApi; // For List
 
 namespace ProtoBufferExample.Client.Game.Views
 {
@@ -29,6 +30,11 @@ namespace ProtoBufferExample.Client.Game.Views
         [SerializeField] private Button _C2S_ChatMessageButton;
         [SerializeField] private Button _C2S_AttackButton;
         [SerializeField] private TMP_Text _testResultText;
+
+        [Header("線上玩家面板")]
+        [SerializeField] private GameObject _playerCardPrefab; // A TMP_Text prefab for individual player cards
+        [SerializeField] private RectTransform _playerCardsContentParent; // The Content RectTransform for player cards
+
 
         private List<GameObject> _currentLogMessages = new List<GameObject>();
 
@@ -55,7 +61,7 @@ namespace ProtoBufferExample.Client.Game.Views
             SetupTestFunctionTabEvents();
         }
 
-         private void SetupConnectionTabEvents()
+        private void SetupConnectionTabEvents()
         {
             _connectButton?.onClick.AddListener(() => _presenter.OnConnectButtonClicked());
         }
@@ -175,6 +181,43 @@ namespace ProtoBufferExample.Client.Game.Views
             float z = Random.Range(0f, 100f);
 
             _presenter.SendPositionUpdate(x, y, z);
+        }
+
+        public void UpdatePlayerCards(List<WorldPosition> players)
+        {
+            if (_playerCardsContentParent == null || _playerCardPrefab == null)
+            {
+                Debug.LogWarning("Player cards panel not configured.");
+                return;
+            }
+
+            try
+            {
+                // Clear existing player cards
+                foreach (Transform child in _playerCardsContentParent)
+                {
+                    Destroy(child.gameObject);
+                }
+
+                foreach (var player in players)
+                {
+                    var playerCard = Instantiate(_playerCardPrefab, _playerCardsContentParent);
+
+                    // 更安全的方式：通過名稱或標籤查找子物件
+                    var playerIdText = playerCard.transform.Find("playerIdText")?.GetComponent<TMP_Text>();
+                    var positionText = playerCard.transform.Find("playerPosText")?.GetComponent<TMP_Text>();
+
+                    if (playerIdText != null)
+                        playerIdText.text = $"玩家ID: {player.PlayerId}";
+
+                    if (positionText != null)
+                        positionText.text = $"位置: ({player.X:F2}, {player.Y:F2}, {player.Z:F2})";
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"Error updating player cards: {ex.Message}");
+            }
         }
 
         #endregion
