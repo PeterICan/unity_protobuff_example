@@ -8,4 +8,6 @@ type IPosition interface {
 
 	// SetPosition 設定玩家位置
 	SetPosition(x, y, z float32)
+	// GetPosition 取得玩家位置
+	GetPosition() (float32, float32, float32)
 }

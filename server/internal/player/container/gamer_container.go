@@ -371,6 +371,17 @@ func (p *GamerContainer) GetOnlineGamer(gamerId uint64) (igamer.IGamer, bool) {
 	return p.getGamer(gamerId, true)
 }
 
+func (p *GamerContainer) GetAllOnlineGamers() []igamer.IGamer {
+	p.mapLock.RLock()
+	defer p.mapLock.RUnlock()
+
+	gamers := make([]igamer.IGamer, 0, len(p.GamerMap))
+	for _, gamer := range p.GamerMap {
+		gamers = append(gamers, gamer)
+	}
+	return gamers
+}
+
 func (p *GamerContainer) getGamer(gamerId uint64, needOnline bool) (igamer.IGamer, bool) {
 	p.mapLock.RLock()
 	gamer, ok := p.GamerMap[gamerId]

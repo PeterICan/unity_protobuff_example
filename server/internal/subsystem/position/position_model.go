@@ -2,10 +2,13 @@ package position
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"proto_buffer_example/server/generated/json_api"
 	"proto_buffer_example/server/internal/mediator"
 	"proto_buffer_example/server/internal/player/interface/igamer"
 	"proto_buffer_example/server/internal/subsystem/base"
+	"proto_buffer_example/server/third-party/antnet"
 )
 
 func NewPositionModel() *PositionModel {
@@ -16,14 +19,12 @@ func NewPositionModel() *PositionModel {
 
 // PositionModel 樣版 model
 type PositionModel struct {
-	onlinePlayers map[uint64]igamer.IGamer
 	base.Information
 }
 
 // Init Model 初始化
 func (p *PositionModel) Init(serviceId int32) {
 	p.ServerId = serviceId
-	p.onlinePlayers = make(map[uint64]igamer.IGamer)
 }
 
 // Start Model 啟動
@@ -50,8 +51,6 @@ func (p *PositionModel) OnPlayerCreate(ctx context.Context, gamer igamer.IGamer)
 
 // OnPlayerEnter 當玩家登入遊戲
 func (p *PositionModel) OnPlayerEnter(ctx context.Context, gamer igamer.IGamer) {
-	p.onlinePlayers[gamer.GetGamerId()] = gamer
-
 }
 
 // OnPlayerExit 當玩家離開遊戲
@@ -69,11 +68,37 @@ func (p *PositionModel) OnUpdatePosition(ctx context.Context, gamer igamer.IGame
 	gamer.GetPositionData().SetPosition(c2s.GetX(), c2s.GetY(), c2s.GetZ())
 	s2c.Route = "position/update"
 	s2c.Error = nil
-	return
 
-	//notify := gamer.GetMsgque().NewTagMsg(uint8(json_api.MsgCategory_Position), uint8(json_api.MsgId_S2CPositionUpdate), 0)
-	//notify.Data = gamer.GetMsgque().PbData(s2c)
-	//gamer.GetMsgque().SendMsg(notify)
+	notify := antnet.NewByteHeadlessMsg()
+	notifyS2C := &json_api.S2CNotifyWorldPositionChange{}
+	notifyS2C.Route = "position/notify_world_position_change"
+	notifyS2C.Positions = p.getOnlinePlayerPosition()
+	s2cJson, err := json.Marshal(notifyS2C)
+	if err != nil {
+		fmt.Printf("Error marshalling response to JSON: %v\n", err)
+		return
+	}
+	notify.Data = s2cJson
+	antnet.SendGroup("BaseGroup", notify)
+}
+
+func (p *PositionModel) getOnlinePlayerPosition() []*json_api.WorldPosition {
+	onlinePlayers := mediator.IGamerContainerModelMdr.GetAllOnlineGamers()
+	positions := make([]*json_api.WorldPosition, len(onlinePlayers))
+	for index, gamer := range onlinePlayers {
+		PlayerId :=
+			fmt.Sprintf("%d", gamer.GetGamerId())
+		posX, posY, posZ := gamer.GetPositionData().GetPosition()
+		position := &json_api.WorldPosition{
+			PlayerId: PlayerId,
+			X:        posX,
+			Y:        posY,
+			Z:        posZ,
+		}
+		positions[index] = position
+	}
+
+	return positions
 }
 
 func (p *PositionModel) groupNotifyDailyReset() {

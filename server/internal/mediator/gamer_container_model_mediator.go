@@ -12,6 +12,8 @@ type IGamerContainerModelMediator interface {
 	GetInstance() IGamerContainerModelMediator
 	// GetOnlineGamer 取得線上玩家物件
 	GetOnlineGamer(gamerId uint64) (igamer.IGamer, bool)
+	// GetAllOnlineGamers 取得所有線上玩家物件
+	GetAllOnlineGamers() []igamer.IGamer
 	// GetMsgQueFromGamerId 透過玩家ID取得msgque
 	GetMsgQueFromGamerId(gamerId uint64) (antnet.IMsgQue, bool)
 	// GetGamerFromMsgque 傳入msgque取得玩家物件

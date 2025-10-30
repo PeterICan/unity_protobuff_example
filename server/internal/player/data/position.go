@@ -61,3 +61,7 @@ func (p *Position) SetPosition(x, y, z float32) {
 	p.PosZ = z
 	p.SetDirty()
 }
+
+func (p *Position) GetPosition() (float32, float32, float32) {
+	return p.PosX, p.PosY, p.PosZ
+}
