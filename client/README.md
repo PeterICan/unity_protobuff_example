@@ -1,78 +1,97 @@
 # 🎮 Unity Client 說明
 
-本專案是 Unity 遊戲客戶端，其核心架構設計是為了實現**應用層與傳輸層的雙重解耦**。遊戲邏輯只處理統一的 C# 資料模型，並可透過配置輕鬆切換到 **Protobuf/TCP** 或 **JSON/HTTP** 模式。
+本專案實現**雙重解耦**的網路通訊架構，支援兩種通訊模式：
 
 ---
 
-## 核心設計理念：雙重抽象
+## 🚀 快速開始
 
-### 1. 服務層 (Service Layer)
+### 1. 設定連線
 
-* **目標：** 遊戲中的業務邏輯（例如發送移動指令、接收登入結果）僅與**統一的 C# Classes** 互動，完全隔離於 Protobuf 格式或 JSON 格式。
-* **關鍵：** 所有的序列化和網路通訊細節都在底層處理。
+在 `NetworkManager` 中配置伺服器位址：
 
-### 2. 協定層 (Protocol Layer)
+- **TCP模式**: `127.0.0.1:8080`
+- **WebSocket模式**: `ws://127.0.0.1:8081`
 
-* **`IConnection` 介面：** 定義抽象的連線、發送 (`Send`) 和接收事件，讓上層業務邏輯得以呼叫，而無需知道底層是 Socket 還是 HTTP。
-* **`ISerializer` 介面：** 定義抽象的序列化/反序列化介面，具體實作可以是 `ProtobufSerializer` 或 `JSONSerializer`。
+### 2. 選擇通訊模式
 
----
+修改相關組件中的實例化代碼：
 
-## 模式 I：高效能 (Protobuf + TCP)
+```csharp
+// 模式 I: TCP + Protobuf
+_connection = new TCPClientTransport();
+_serializer = new ProtobufSerializer();
 
-此模式用於與 Go Server 建立長連線 (Persistent Connection)，處理即時、低延遲的遊戲數據。
+// 模式 II: WebSocket + JSON  
+_connection = new WebSocketClientTransport();
+_serializer = new JSONSerializer();
+```
 
-### 協定實作細節
+### 3. 運行測試
 
-* **C# 網路:** 使用 `System.Net.Sockets.TcpClient` 實現非同步連線。
-* **傳輸實作:** **`TCPClientTransport`** 類別實現 `IConnection` 介面。
-* **封包處理:** 實作 **長度前綴 (Length-Prefixing)** 機制，從 TCP 位元組流中可靠地讀取完整的 Protobuf 封包。
-* **序列化:** **`ProtobufSerializer`** 負責將統一 C# Classes 轉換為 Protobuf 二進位格式。
-* **線程安全:** 所有網路讀寫都在後台線程（或 Task）中，透過主線程調度器 (Dispatcher) 將結果安全地回傳給 Unity 主循環。
-
-### ▶️ 運行步驟 (模式 I)
-
-1.  **配置 Server IP/Port：** 在 `NetworkManager` 或配置腳本中，設定正確的 Server IP 和 Port (e.g., `8080`)。
-2.  **切換模式：** 確保配置為實例化 `TCPClientTransport`。
-3.  **運行：** 在 Unity Editor 中運行主場景。
+在 Unity Editor 中運行主場景，使用 UI 介面測試位置更新和玩家資訊功能。
 
 ---
 
-## 模式 II：高相容性 (JSON + REST API)
+## 📦 建置執行檔
 
-此模式用於處理登入、配置獲取、或其他無需長連線的業務操作。
+執行根目錄下的建置腳本：
 
-### 協定實作細節
+```bash
+client\build_project.bat
+```
 
-* **C# 網路:** 使用 `UnityEngine.Networking.UnityWebRequest` 或 `HttpClient` 處理 HTTP 請求。
-* **傳輸實作:** **`HttpClientTransport`** 類別實現 `IConnection` 介面。每個 `Send` 操作將觸發一個獨立的 HTTP 請求。
-* **序列化:** **`JSONSerializer`** 負責將統一 C# Classes 序列化為 JSON，並處理從 Server 返回的 JSON 響應。
-* **NJsonSchema/OpenAPI:** 可利用生成的 C# 客戶端代碼或模式驗證工具，確保 JSON 資料的格式正確性。
-
-### ▶️ 運行步驟 (模式 II)
-
-1.  **配置 Server URL：** 在 `NetworkManager` 或配置腳本中，設定正確的 REST API URL (e.g., `http://127.0.0.1:8081/api/login`)。
-2.  **切換模式：** 確保配置為實例化 `HttpClientTransport`。
-3.  **運行：** 在 Unity Editor 中運行主場景。
+建置完成後，執行檔位於 `Client/Builds/` 目錄。
 
 ---
 
-## 建置 Unity Client 執行檔
+## 📁 專案結構
 
-您可以透過專案根目錄下的 `client/build_project.bat` 腳本自動建置 Unity Client 執行檔。
+```
+Client/Assets/Scripts/
+├── Game/
+│   ├── Models/                    # 資料和業務邏輯
+│   │   └── ConnectionModel.cs
+│   ├── Presenters/                # MVP模式的協調層
+│   │   └── ConnectionPresenter.cs
+│   ├── Singleton/                 # 全域管理器
+│   │   └── SystemManager.cs
+│   ├── TestScript/                # 網路功能測試
+│   │   ├── AntnetEchoTest.cs
+│   │   └── PositionUpdateTest.cs
+│   └── Views/                     # UI介面組件
+│       ├── ConnectionView.cs
+│       ├── IConnectionView.cs
+│       └── TabManagerView.cs
+└── Network/
+    ├── Serializers/               # 序列化抽象層
+    │   ├── ISerializer.cs         # 序列化介面
+    │   ├── JSONSerializer.cs      # JSON序列化實作
+    │   └── ProtobufSerializer.cs  # Protobuf序列化實作
+    └── Transports/                # 傳輸抽象層
+        ├── IConnection.cs         # 連線介面
+        ├── TCPClientTransport.cs  # TCP實作
+        └── WebSocketClientTransport.cs # WebSocket實作
+```
 
-**主要功能：**
+### 核心組件說明
 
-*   **自動偵測 Unity 版本：** 腳本會從 `ProjectSettings/ProjectVersion.txt` 中讀取專案所需的 Unity 編輯器版本。
-*   **驗證 Unity 編輯器路徑：** 確保安裝了正確版本的 Unity 編輯器。
-*   **批次模式建置：** 在沒有圖形介面的情況下執行 Unity 建置，適合自動化流程。
-*   **輸出日誌：** 建置過程中的日誌會輸出到 `build_log.txt`。
+- **Network層**: 實現雙重抽象的核心，分離序列化與傳輸邏輯
+- **Game層**: 採用MVP模式，分離UI、業務邏輯與資料
+- **TestScript**: 提供各種網路功能的測試用例
 
-**使用方式：**
+---
 
-1.  **安裝 Unity 編輯器：** 確保透過 Unity Hub 安裝了與專案 `ProjectSettings/ProjectVersion.txt` 中指定版本相符的 Unity 編輯器。
-2.  **執行建置腳本：** 從專案的**根目錄**執行：
-    ```bash
-    client\build_project.bat
-    ```
-3.  **檢查輸出：** 成功建置後，可執行檔將位於 `Client/Builds/` 目錄下。
+## 🏗️ 架構設計
+
+### 抽象層介面
+
+- **`IConnection`**: 抽象網路連線（TCP/WebSocket）
+- **`ISerializer`**: 抽象序列化（Protobuf/JSON）
+
+### 通訊模式
+
+| 模式 | 協定 | 用途 | 實作類別 |
+|------|------|------|----------|
+| **模式 I** | Protobuf + TCP | 即時遊戲數據 | `TCPClientTransport` + `ProtobufSerializer` |
+| **模式 II** | JSON + WebSocket | Web友好通訊 | `WebSocketClientTransport` + `JSONSerializer` |

@@ -1,135 +1,72 @@
 # 💻 Go Server 說明
 
-本伺服器使用 **Go (Golang)** 實作，專注於維護核心業務邏輯的**中立性**。它透過抽象化層，能夠切換啟動 **TCP Socket 伺服器** (用於 Protobuf) 或 **HTTP 伺服器** (用於 JSON/REST API)。
+本伺服器使用 **Go + antnet 框架**，支援兩種通訊模式：
 
 ---
 
-## 核心設計理念：雙重抽象
+## 🚀 快速啟動
 
-### 1. 服務層 (Service Layer)
+### 方式一：直接執行
 
-* **目標：** 核心業務邏輯（例如處理登入請求）僅與**統一的 Go Structs** 互動，完全隔離於 Protobuf 或 JSON 格式。
-* **關鍵：** 業務邏輯不應包含任何網路 I/O 或序列化/反序列化程式碼。
+```bash
+cd server
+go run internal/main.go
+```
 
-### 2. 協定層 (Protocol Layer)
+### 方式二：建置執行檔
 
-* **`IConnection` 介面：** 定義抽象的發送/接收機制，讓上層業務邏輯得以呼叫。
-* **`ISerializer` 介面：** 定義抽象的序列化/反序列化介面，具體實作可以是 `ProtobufSerializer` 或 `JSONSerializer`。
+```bash
+# 執行建置腳本
+build_server.bat
 
----
+# 執行產生的檔案
+server_executable
+```
 
-## 模式 I：高效能 (Protobuf + TCP)
+### 方式三：Docker 部署
 
-此模式用於處理即時、高頻率的數據交換。
-
-### 協定實作細節
-
-* **Go 網路:** 使用 `net.Listener` 建立 TCP 伺服器。
-* **傳輸協定:** 實作 **`TCPTransport`** 類別來具體執行 `IConnection` 介面。
-* **封包分隔:** 實作 **長度前綴 (Length-Prefixing)** 機制，格式為 `[4-byte Length] [Protobuf Wrapper Binary Data]`。
-* **序列化:** 使用 **`ProtobufSerializer`** 負責將統一的 Go Structs 轉換為 Protobuf 格式，並封裝進 `WrapperMessage` 中。
-
-### ▶️ 啟動步驟 (模式 I)
-
-1. **進入 Server 目錄：**
-
-    ```bash
-    cd Server
-    ```
-
-2. **啟動伺服器：**
-    * 假設 `main.go` 中已配置啟動 TCP 模式的邏輯。
-
-    ```bash
-    go run main.go --mode=tcp
-    ```
-
-    * **預設埠號：8080**。
+```bash
+.\build_docker_compose.bat
+```
 
 ---
 
-## 模式 II：高相容性 (JSON + REST API)
+## 📡 通訊模式
 
-此模式用於處理非即時、可靠性要求高的配置或管理操作。
+| 模式 | 協定 | 埠號 | 用途 | 設定方式 |
+|------|------|------|------|----------|
+| **模式 I** | TCP + Protobuf | 6666 | 高效能即時通訊 | `serverType := "tcp"` |
+| **模式 II** | WebSocket + JSON | 7777 | Web 友好通訊 | `serverType := "ws"` |
 
-### 協定實作細節
+## ⚙️ 模式切換
 
-* **Go 網路:** 使用 `net/http` 建立 HTTP 伺服器。
-* **傳輸協定:** 使用標準 HTTP 請求/回應週期，不使用 `IConnection` 抽象。
-* **資料格式:** 使用 **`JSONSerializer`** 負責將收到的 JSON 資料反序列化為統一的 Go Structs，並將回傳的 Go Structs 序列化為 JSON。
-* **文件/驗證:** 可利用 **NJsonSchema/OpenAPI** 相關工具來驗證請求與回應的 JSON 格式。
+在 `server/internal/main.go` 中修改：
 
-### ▶️ 啟動步驟 (模式 II)
+```go
+// 設定 serverType 為 "tcp" 或 "ws"
+serverType := "ws"  // 改為 "tcp" 以使用 TCP 模式
+```
 
-1. **進入 Server 目錄：**
+## 🎯 核心特色
 
-    ```bash
-    cd Server
-    ```
-
-2. **啟動伺服器：**
-    * 假設 `main.go` 中已配置啟動 HTTP 模式的邏輯。
-
-    ```bash
-    go run main.go --mode=http --port=8081
-    ```
-
-    * **預設埠號：8081** (與 TCP 模式區分)。
+- **雙重抽象架構**：業務邏輯與通訊協定完全解耦
+- **統一資料模型**：兩種模式共用相同的 Go 結構體
+- **自定義路由解析**：優化 JSON 訊息分發效能
 
 ---
 
-## 建置 Go Server 執行檔
+## 🔧 開發指令
 
-您可以透過 `server/build_server.bat` 腳本自動建置 Go Server 執行檔。
+```bash
+# 安裝依賴
+go mod tidy
 
-**主要功能：**
+# 生成 Protobuf 程式碼
+generate_go_proto.bat
 
-* **自動導航：** 腳本會自動切換到其所在目錄，確保建置過程中的路徑正確性。
-* **執行 `go build`：** 使用 `go build -o server_executable main.go` 命令生成執行檔。
+# 建置執行檔
+build_server.bat
 
-**使用方式：**
-
-1. **執行建置腳本：** 從專案的**根目錄**執行：
-
-    ```bash
-    server\build_server.bat
-    ```
-
-2. **檢查輸出：** 成功建置後，可執行檔將位於 `server/server_executable`。
-
-## 使用 Docker Compose 部署
-
-您可以使用 Docker Compose 來建置 Docker 映像並啟動 Go Server 服務。
-
-**前置條件：**
-
-* 已安裝 Docker Desktop 或 Docker Engine。
-
-**使用方式：**
-
-1. **建置並啟動服務：**
-    從 `server` 目錄執行以下命令：
-
-    ```bash
-    .\build_docker_compose.bat
-    ```
-
-    此腳本會建置 Docker 映像並以後台模式 (`-d`) 啟動服務。
-
-2. **查看服務狀態：**
-
-    ```bash
-    docker-compose ps
-    ```
-
-3. **查看服務日誌：**
-
-    ```bash
-    docker-compose logs -f
-    ```
-
-4. **停止並移除服務：**
-
-    ```bash
-    docker-compose down
-    ```
+# Docker 部署
+build_docker_compose.bat
+```
